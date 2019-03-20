@@ -111,15 +111,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BusNode.cpp" />
     <ClCompile Include="DXCore.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="MessageBus.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BusNode.h" />
     <ClInclude Include="DXCore.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="MessageBus.h" />
     <ClInclude Include="SimpleShader.h" />
+    <ClInclude Include="Topic.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

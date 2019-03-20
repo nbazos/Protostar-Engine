@@ -26,6 +26,15 @@
     <ClCompile Include="SimpleShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageBus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BusNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXCore.h">
@@ -38,6 +47,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageBus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BusNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Topic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
