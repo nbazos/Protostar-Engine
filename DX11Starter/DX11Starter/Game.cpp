@@ -69,6 +69,9 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	i = Input(&messageBus);
+	e = Entity(&messageBus);
 }
 
 // --------------------------------------------------------
@@ -230,6 +233,12 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+
+	for (int ctr = 0; ctr < 50; ctr++) {
+		i.update();
+		e.update();
+		messageBus.notify();
+	}
 }
 
 // --------------------------------------------------------

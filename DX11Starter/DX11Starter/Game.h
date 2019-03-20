@@ -3,6 +3,9 @@
 #include "DXCore.h"
 #include "SimpleShader.h"
 #include <DirectXMath.h>
+#include "MessageBus.h"
+#include "Input.h"
+#include "Entity.h"
 
 class Game 
 	: public DXCore
@@ -47,5 +50,10 @@ private:
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
+
+	// MesageBus
+	MessageBus messageBus;
+	Input i;
+	Entity e;
 };
 
