@@ -1,3 +1,25 @@
+struct DirectionalLight
+{
+	float4 AmbientColor;
+	float4 DiffuseColor;
+	float3 Direction;
+};
+
+// Constant Buffer
+// - Allows us to define a buffer of individual variables 
+//    which will (eventually) hold data from our C++ code
+// - All non-pipeline variables that get their values from 
+//    our C++ code must be defined inside a Constant Buffer
+// - The name of the cbuffer itself is unimportant
+cbuffer externalData : register(b0)
+{
+	DirectionalLight light;
+	DirectionalLight light2;
+};
+
+// A6
+Texture2D DiffuseTexture : register(t0);
+SamplerState Sampler : register(s0);
 
 // Struct representing the data we expect to receive from earlier pipeline stages
 // - Should match the output of our corresponding vertex shader
@@ -12,8 +34,21 @@ struct VertexToPixel
 	//  |    |                |
 	//  v    v                v
 	float4 position		: SV_POSITION;
-	float4 color		: COLOR;
+	float3 normal		: NORMAL;			// normal
+	float2 uv			: TEXCOORD;			// uv
+	// float4 color		: COLOR;
 };
+
+// Helper method to calculate the final light color for each source
+float4 CalculateFinalLightColor(float3 normal, DirectionalLight light)
+{
+	float3 normalDirToLight = normalize(light.Direction);
+
+	float NdotL = dot(normal, -normalDirToLight);
+	NdotL = saturate(NdotL);
+
+	return float4((light.AmbientColor + (light.DiffuseColor * NdotL)));
+}
 
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
@@ -26,9 +61,22 @@ struct VertexToPixel
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
+	// A5 - Normalize
+	input.normal = normalize(input.normal);
+
+	// Lighting Calculations
+
+	// Directional Light 1
+	float4 dLight1 = CalculateFinalLightColor(input.normal, light);
+	// Directional Light 2
+	float4 dLight2 = CalculateFinalLightColor(input.normal, light2);
+	
+	// A6 - Textures
+	float4 surfaceColor = DiffuseTexture.Sample(Sampler, input.uv);
+
 	// Just return the input color
 	// - This color (like most values passing through the rasterizer) is 
 	//   interpolated for each pixel between the corresponding vertices 
 	//   of the triangle we're rendering
-	return input.color;
+	return dLight1 * surfaceColor + dLight2 * surfaceColor;
 }
