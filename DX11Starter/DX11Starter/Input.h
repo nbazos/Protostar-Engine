@@ -1,16 +1,15 @@
 #pragma once
 
-#include "BusNode.h"
+#include <Windows.h>
+#include "System.h"
 
-// Send a message to gameplay
-
-class Input : public BusNode
+class Input : public System
 {
 public:
 	Input();
-	Input(MessageBus* messageBus):BusNode(messageBus) {}
+	Input(EventBus * eventBusPtr) : System(eventBusPtr) {}
 	~Input();
 
-	void update();
+	void getInput();
 };
 

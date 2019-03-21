@@ -3,9 +3,9 @@
 #include "DXCore.h"
 #include "SimpleShader.h"
 #include <DirectXMath.h>
-#include "MessageBus.h"
+#include "EventBus.h"
+#include "PlayerEntity.h"
 #include "Input.h"
-#include "Entity.h"
 
 class Game 
 	: public DXCore
@@ -51,9 +51,13 @@ private:
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
 
-	// MesageBus
-	MessageBus messageBus;
-	Input i;
-	Entity e;
+
+	
+	// Event Bus
+	EventBus eventBus;
+
+	// Game Systems
+	PlayerEntity playerEntitySystem;
+	Input inputSystem;
 };
 

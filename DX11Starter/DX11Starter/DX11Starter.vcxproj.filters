@@ -26,19 +26,10 @@
     <ClCompile Include="SimpleShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Message.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MessageBus.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BusNode.cpp">
+    <ClCompile Include="PlayerEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,22 +46,16 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Message.h">
+    <ClInclude Include="EventBus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageBus.h">
+    <ClInclude Include="PlayerEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BusNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Topic.h">
+    <ClInclude Include="System.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

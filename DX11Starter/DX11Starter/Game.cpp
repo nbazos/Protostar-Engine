@@ -70,8 +70,13 @@ void Game::Init()
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	i = Input(&messageBus);
-	e = Entity(&messageBus);
+	// Event Bus
+	eventBus = EventBus();
+	// Game Systems
+	playerEntitySystem = PlayerEntity(&eventBus);
+	playerEntitySystem.init();
+	inputSystem = Input(&eventBus);
+	inputSystem.init();
 }
 
 // --------------------------------------------------------
@@ -234,11 +239,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	for (int ctr = 0; ctr < 50; ctr++) {
-		i.update();
-		e.update();
-		messageBus.notify();
-	}
+	inputSystem.getInput();
 }
 
 // --------------------------------------------------------
