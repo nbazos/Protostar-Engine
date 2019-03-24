@@ -7,6 +7,8 @@
 
 using namespace DirectX;
 
+// To be replaced with Israel's version
+
 class GameEntity
 {
 public:
