@@ -1,106 +1,84 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity(Mesh* meshPTr, Material* materialPtr)
+GameEntity::GameEntity(Mesh* mesh, Material* material, ID3D11DeviceContext* context)
 {
-	this->meshPtr = meshPTr;
-	this->materialPtr = materialPtr;
+	entityMesh = mesh;
+	entityMaterial = material;
+	deviceContext = context;
 
 	XMMATRIX W = XMMatrixIdentity();
-
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W)); // Transpose for HLSL!;
-
-	XMStoreFloat4x4(&trans4X4, XMMatrixTranspose(W)); // Transpose for HLSL!;
-
-	XMStoreFloat4x4(&scale4X4, XMMatrixTranspose(W)); // Transpose for HLSL!;
-
-	XMStoreFloat4x4(&rot4X4, XMMatrixTranspose(W)); // Transpose for HLSL!;
-}
-
-GameEntity::GameEntity()
-{
-	this->meshPtr = nullptr;
-	this->materialPtr = nullptr;
-
-	XMMATRIX W = XMMatrixIdentity();
-
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W)); // Transpose for HLSL!;
-
-	XMStoreFloat4x4(&trans4X4, XMMatrixTranspose(W)); // Transpose for HLSL!;
-
-	XMStoreFloat4x4(&scale4X4, XMMatrixTranspose(W)); // Transpose for HLSL!;
-
-	XMStoreFloat4x4(&rot4X4, XMMatrixTranspose(W)); // Transpose for HLSL!;
+	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W));
+	position = XMFLOAT3(0, 0, 0);
+	scale = XMFLOAT3(1, 1, 1);
+	rotation = XMFLOAT3(0, 0, 0);
 }
 
 GameEntity::~GameEntity()
 {
 }
 
-// getters
-
-XMFLOAT4X4 GameEntity::GetWorldMatrix()
+void GameEntity::SetWorldMatrix()
 {
-	return worldMatrix;
+	XMMATRIX pos = XMMatrixTranslation(position.x, position.y, position.z);
+	XMMATRIX scal = XMMatrixScaling(scale.x, scale.y, scale.z);
+	XMVECTOR rotQuat = XMQuaternionRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+	XMMATRIX rotXYZ = XMMatrixRotationQuaternion(rotQuat);
+	XMMATRIX worldMat = scal * rotXYZ * pos;
+	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(worldMat));
 }
 
-XMFLOAT4X4 GameEntity::GetTranslationMatrix4X4()
+void GameEntity::SetPosition(float posX, float posY, float posZ)
 {
-	return trans4X4;
+	position.x = posX;
+	position.y = posY;
+	position.z = posZ;
 }
 
-XMFLOAT4X4 GameEntity::GetScaleMatrix4X4()
+void GameEntity::SetScale(float scalar)
 {
-	return scale4X4;
+	scale.x = scalar;
+	scale.y = scalar;
+	scale.z = scalar;
 }
 
-XMFLOAT4X4 GameEntity::GetRotMatrix4X4()
+void GameEntity::SetRotation(float pitch, float yaw, float roll)
 {
-	return rot4X4;
+	rotation.x = pitch * XM_PI / 180;
+	rotation.y = yaw * XM_PI / 180;
+	rotation.z = roll * XM_PI / 180;
 }
 
-Mesh * GameEntity::GetMeshPtr()
+void GameEntity::Draw(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat)
 {
-	return meshPtr;
+	PrepareMaterials(viewMat, projectionMat);
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	ID3D11Buffer* vertexBuffer = entityMesh->GetVertexBuffer();
+	deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	deviceContext->IASetIndexBuffer(entityMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->DrawIndexed(
+		entityMesh->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
 }
 
-// calcuate entity world matrix
-
-void GameEntity::CalculateWorldMatrix()
+void GameEntity::PrepareMaterials(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat)
 {
-	XMMATRIX translation = XMLoadFloat4x4(&trans4X4);
+	// Send data to shader variables
+	entityMaterial->GetVertexShader()->SetMatrix4x4("world", worldMatrix);
+	entityMaterial->GetVertexShader()->SetMatrix4x4("view", viewMat);
+	entityMaterial->GetVertexShader()->SetMatrix4x4("projection", projectionMat);
 
-	XMMATRIX rotation = XMLoadFloat4x4(&rot4X4);
+	entityMaterial->GetPixelShader()->SetShaderResourceView("diffuseTexture", entityMaterial->GetSRV());
+	entityMaterial->GetPixelShader()->SetSamplerState("basicSampler", entityMaterial->GetSamplerState());
 
-	XMMATRIX scale = XMLoadFloat4x4(&scale4X4);
+	// Send data to GPU
+	entityMaterial->GetVertexShader()->CopyAllBufferData();
+	entityMaterial->GetPixelShader()->CopyAllBufferData();
 
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(scale * rotation * translation));
+	// Set the vertex and pixel shaders to use for the next Draw() command
+	entityMaterial->GetVertexShader()->SetShader();
+	entityMaterial->GetPixelShader()->SetShader();
 }
 
-// setters
 
-void GameEntity::SetTranslationMatrix4X4(XMMATRIX trans)
-{
-	XMStoreFloat4x4(&trans4X4, trans);
-}
-
-void GameEntity::SetScaleMatrix4X4(XMMATRIX scale)
-{
-	XMStoreFloat4x4(&scale4X4, scale);
-}
-
-void GameEntity::SetRotMatrix4X4(XMMATRIX rot)
-{
-	XMStoreFloat4x4(&rot4X4, rot);
-}
-
-// prepare entity material
-
-void GameEntity::PrepareMaterial(XMFLOAT4X4 cameraView, XMFLOAT4X4 cameraProjection)
-{
-	materialPtr->GetVertexShader()->SetMatrix4x4("world", worldMatrix);
-	materialPtr->GetVertexShader()->SetMatrix4x4("view", cameraView);
-	materialPtr->GetVertexShader()->SetMatrix4x4("projection", cameraProjection);
-
-	materialPtr->GetPixelShader()->SetSamplerState("Sampler", materialPtr->samplerStatePtr);
-	materialPtr->GetPixelShader()->SetShaderResourceView("DiffuseTexture", materialPtr->srvPtr);
-}

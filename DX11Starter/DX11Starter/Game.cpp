@@ -1,6 +1,9 @@
 #include "Game.h"
 #include "Vertex.h"
 
+// DirectX Tool Kit headers
+#include "WICTextureLoader.h" // WIC = Windows Imaging Component
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -23,10 +26,12 @@ Game::Game(HINSTANCE hInstance)
 	// Initialize fields
 	vertexShader = 0;
 	pixelShader = 0;
-
-	// A4
-	camera = Camera();
-	camera.UpdateProjectionMatrix4x4(1280, 720);
+	camera = 0;
+	material1 = 0;
+	material2 = 0;
+	brickSRV = 0;
+	grassSRV = 0;
+	sampler = 0;
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -47,22 +52,17 @@ Game::~Game()
 	// will clean up their own internal DirectX stuff
 	delete vertexShader;
 	delete pixelShader;
+	delete camera;
 
-	// A2 - Delete Mesh Objects
-	delete meshObj1;
-	delete meshObj2;
-	delete meshObj3;
+	delete material1;
+	delete material2;
+	brickSRV->Release();
+	grassSRV->Release();
+	sampler->Release();
 
-	// A4 & A6 - Delete Material
-	delete stoneWallMat;
-	delete rockMat;
-	delete brickMat;
-
-	// A6
-	samplerStatePtr->Release();
-	rockSurfaceSRVPtr->Release();
-	stoneWallSurfaceSRVPtr->Release();
-	brickSurfaceSRVPtr->Release();
+	// Delete Meshes & GameEntities
+	for (auto& m : meshes) delete m;
+	for (auto& e : gameEntities) delete e;
 }
 
 // --------------------------------------------------------
@@ -75,63 +75,21 @@ void Game::Init()
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
-	CreateMatrices();
-	CreateBasicGeometry();
+	CreateMaterials();
+	CreateBasicGeometry();	
 
-	// A6
-
-	// Load Textures
-	rockSurfaceSRVPtr = nullptr;
-	CreateWICTextureFromFile(device, context, L"../../Assets/Textures/rocksurface.tif", 0, &rockSurfaceSRVPtr);
-
-	stoneWallSurfaceSRVPtr = nullptr;
-	CreateWICTextureFromFile(device, context, L"../../Assets/Textures/stonewall.tif", 0, &stoneWallSurfaceSRVPtr);
-
-	brickSurfaceSRVPtr = nullptr;
-	CreateWICTextureFromFile(device, context, L"../../Assets/Textures/brick.png", 0, &brickSurfaceSRVPtr);
-
-	// Sampler State
-	D3D11_SAMPLER_DESC samplerState = {};
-	samplerState.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerState.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerState.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerState.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerState.MaxLOD = D3D11_FLOAT32_MAX;
-
-	device->CreateSamplerState(&samplerState, &samplerStatePtr);
-
-	// A3 & A4 & A6
-
-	// Define the materials and meshes of the in-game entities
-	stoneWallMat = new Material(vertexShader, pixelShader, stoneWallSurfaceSRVPtr, samplerStatePtr);
-
-	entities.push_back(GameEntity(meshObj1, stoneWallMat));
-	entities.push_back(GameEntity(meshObj1, stoneWallMat));
-	entities.push_back(GameEntity(meshObj1, stoneWallMat));
-
-	rockMat = new Material(vertexShader, pixelShader, rockSurfaceSRVPtr, samplerStatePtr);
-
-	entities.push_back(GameEntity(meshObj2, rockMat));
-	entities.push_back(GameEntity(meshObj2, rockMat));
-	entities.push_back(GameEntity(meshObj2, rockMat));
-
-	brickMat = new Material(vertexShader, pixelShader, brickSurfaceSRVPtr, samplerStatePtr);
-
-	entities.push_back(GameEntity(meshObj3, brickMat));
-	entities.push_back(GameEntity(meshObj3, brickMat));
-	entities.push_back(GameEntity(meshObj3, brickMat));
-
-	// A5
-	dirLight = DirectionalLight();
-	dirLight2 = DirectionalLight2();
-
-	// Event Bus
 	eventBus = EventBus();
-	// Game Systems
+	inputSystem = Input(&eventBus);
 	playerEntitySystem = PlayerEntity(&eventBus);
 	playerEntitySystem.init();
-	inputSystem = Input(&eventBus);
-	inputSystem.init();
+
+	// Create camera & initial projection matrix
+	camera = new Camera(0.0f, 0.0f, -5.0f);
+	camera->UpdateProjectionMatrix((float)width / height);
+
+	// Define directional lights for the scene
+	dirLight1 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f)};
+	dirLight2 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)};
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -154,48 +112,35 @@ void Game::LoadShaders()
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
 }
 
-
-
-// --------------------------------------------------------
-// Initializes the matrices necessary to represent our geometry's 
-// transformations and our 3D camera
-// --------------------------------------------------------
-void Game::CreateMatrices()
+void Game::CreateMaterials()
 {
-	// Set up world matrix
-	// - In an actual game, each object will need one of these and they should
-	//    update when/if the object moves (every frame)
-	// - You'll notice a "transpose" happening below, which is redundant for
-	//    an identity matrix.  This is just to show that HLSL expects a different
-	//    matrix (column major vs row major) than the DirectX Math library
-	XMMATRIX W = XMMatrixIdentity();
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W)); // Transpose for HLSL!
+	// Load textures
+	CreateWICTextureFromFile(
+		device,					// The Direct3D device for resource creation
+		context,				// Rendering context (this will auto-generate mip maps!!!)
+		L"../../Assets/Textures/round_brick.jpg",	// Path to the file ("L" means wide characters)
+		0,						// Texture ref?  No thanks!  (0 means we don't want an extra ref)
+		&brickSRV);				// Actual SRV for use with shaders
 
-	// Create the View matrix
-	// - In an actual game, recreate this matrix every time the camera 
-	//    moves (potentially every frame)
-	// - We're using the LOOK TO function, which takes the position of the
-	//    camera and the direction vector along which to look (as well as "up")
-	// - Another option is the LOOK AT function, to look towards a specific
-	//    point in 3D space
-	XMVECTOR pos = XMVectorSet(0, 0, -5, 0);
-	XMVECTOR dir = XMVectorSet(0, 0, 1, 0);
-	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
-	XMMATRIX V = XMMatrixLookToLH(
-		pos,     // The position of the "camera"
-		dir,     // Direction the camera is looking
-		up);     // "Up" direction in 3D space (prevents roll)
-	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V)); // Transpose for HLSL!
+	CreateWICTextureFromFile(
+		device,					// The Direct3D device for resource creation
+		context,				// Rendering context (this will auto-generate mip maps!!!)
+		L"../../Assets/Textures/grass.jpg",	// Path to the file ("L" means wide characters)
+		0,						// Texture ref?  No thanks!  (0 means we don't want an extra ref)
+		&grassSRV);
 
-	// Create the Projection matrix
-	// - This should match the window's aspect ratio, and also update anytime
-	//    the window resizes (which is already happening in OnResize() below)
-	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,		// Field of View Angle
-		(float)width / height,		// Aspect ratio
-		0.1f,						// Near clip plane distance
-		100.0f);					// Far clip plane distance
-	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
+	// Create sampler state
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	device->CreateSamplerState(&samplerDesc, &sampler);
+
+	material1 = new Material(vertexShader, pixelShader, brickSRV, sampler);
+	material2 = new Material(vertexShader, pixelShader, grassSRV, sampler);
 }
 
 
@@ -204,35 +149,52 @@ void Game::CreateMatrices()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	// Create some temporary variables to represent colors
-	// - Not necessary, just makes things more readable
-	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	
 
-	// Set up the vertices of the triangle we would like to draw
-	// - We're going to copy this array, exactly as it exists in memory
-	//    over to a DirectX-controlled data structure (the vertex buffer)
-	Vertex obj1Vertices[] =
-	{
-		{ XMFLOAT3(+2.0f, +1.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
-		{ XMFLOAT3(+2.5f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
-		{ XMFLOAT3(+1.5f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
-	};
+	Mesh* torusMesh = new Mesh("../../Assets/Models/torus.obj", device); // create triangle mesh
+	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
+	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
+	Mesh* helixMesh = new Mesh("../../Assets//Models/helix.obj", device);
+	Mesh* sphereMesh = new Mesh("../../Assets/Models/sphere.obj", device);
+	meshes.push_back(torusMesh);
+	meshes.push_back(cubeMesh);
+	meshes.push_back(coneMesh);
+	meshes.push_back(helixMesh);
+	meshes.push_back(sphereMesh);
 
-	// Set up the indices, which tell us which vertices to use and in which order
-	// - This is somewhat redundant for just 3 vertices (it's a simple example)
-	// - Indices are technically not required if the vertices are in the buffer 
-	//    in the correct order and each one will be used exactly once
-	// - But just to see how it's done...
+	// Create GameEntities that utilize the meshes
+	GameEntity* torus = new GameEntity(torusMesh, material1, context);
+	GameEntity* cube = new GameEntity(cubeMesh, material1, context);
+	GameEntity* cone = new GameEntity(coneMesh, material1, context);
+	GameEntity* helix = new GameEntity(helixMesh, material2, context);
+	GameEntity* sphere = new GameEntity(sphereMesh, material2, context);
+	gameEntities.push_back(torus);
+	gameEntities.push_back(cube);
+	gameEntities.push_back(cone);
+	gameEntities.push_back(helix);
+	gameEntities.push_back(sphere);
 
-	// A5 - New Geometry
+	// Set transformations
+	torus->SetPosition(-3, -1, 0);
+	torus->SetScale(0.5);
+	torus->SetWorldMatrix();
 
-	meshObj1 = new Mesh("../../Assets/Models/cube.obj", device);
+	cube->SetScale(0.5);
+	cube->SetPosition(-1, 0, 0);
+	cube->SetRotation(0.0f, 45.0f, 0.0f);
+	cube->SetWorldMatrix();
 
-	meshObj2 = new Mesh("../../Assets/Models/helix.obj", device);
+	cone->SetScale(0.5);
+	cone->SetPosition(2, -1, 0);
+	cone->SetWorldMatrix();
 
-	meshObj3 = new Mesh("../../Assets/Models/sphere.obj", device);
+	helix->SetScale(0.5);
+	helix->SetPosition(3, 1, 0);
+	helix->SetWorldMatrix();
+
+	sphere->SetScale(0.5);
+	sphere->SetPosition(0.5, 0, 0);
+	sphere->SetWorldMatrix();
 }
 
 
@@ -245,18 +207,7 @@ void Game::OnResize()
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
 
-	// Update our projection matrix since the window size changed
-	/*
-	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,	// Field of View Angle
-		(float)width / height,	// Aspect ratio
-		0.1f,				  	// Near clip plane distance
-		100.0f);			  	// Far clip plane distance
-	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
-	*/
-
-	camera.UpdateProjectionMatrix4x4(width, height);
-
+	camera->UpdateProjectionMatrix((float)width / height);
 }
 
 // --------------------------------------------------------
@@ -268,82 +219,11 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	// Event-Messaging System Test
 	inputSystem.getInput();
 
-	// A4
-	camera.Update(deltaTime);
+	// Update Camera
+	camera->Update(deltaTime);
 
-	// A3
-
-	// Create sinTiem variable that increases and decreases
-	float sinTime = (sin(totalTime * 10) + 2.0f) / 10.0f;
-
-	// Do transformation work for each entity
-
-	// Entity 1
-	entities[0].SetTranslationMatrix4X4(XMMatrixTranslation(-1, -1, 0));
-	XMVECTOR rotQuat = XMQuaternionRotationRollPitchYaw(0, 0, totalTime);
-	entities[0].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[0].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[0].CalculateWorldMatrix();
-
-	// Entity 2
-	entities[1].SetTranslationMatrix4X4(XMMatrixTranslation(1, -1, 0));
-	entities[1].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[1].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[1].CalculateWorldMatrix();
-
-	// Entity 3
-	entities[2].SetTranslationMatrix4X4(XMMatrixTranslation(0, -1, 0));
-	entities[2].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[2].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[2].CalculateWorldMatrix();
-
-	// Entity 4
-	entities[3].SetTranslationMatrix4X4(XMMatrixTranslation(-1, 1, 0));
-	entities[3].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[3].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[3].CalculateWorldMatrix();
-
-	// Entity 5
-	entities[4].SetTranslationMatrix4X4(XMMatrixTranslation(1, 1, 0));
-	entities[4].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[4].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[4].CalculateWorldMatrix();
-
-	// Entity 6 
-	entities[5].SetTranslationMatrix4X4(XMMatrixTranslation(0, 1, 0));
-	entities[5].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[5].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[5].CalculateWorldMatrix();
-
-	// Entity 7 
-	entities[6].SetTranslationMatrix4X4(XMMatrixTranslation(-1, 0, 0));
-	entities[6].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[6].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[6].CalculateWorldMatrix();
-
-	// Entity 8 
-	entities[7].SetTranslationMatrix4X4(XMMatrixTranslation(1, 0, 0));
-	entities[7].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[7].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[7].CalculateWorldMatrix();
-
-	// Entity 9 
-	entities[8].SetTranslationMatrix4X4(XMMatrixTranslation(0, 0, 0));
-	entities[8].SetRotMatrix4X4(XMMatrixRotationQuaternion(rotQuat));
-	entities[8].SetScaleMatrix4X4(XMMatrixScaling(sinTime, sinTime, sinTime));
-
-	entities[8].CalculateWorldMatrix();
 }
 
 // --------------------------------------------------------
@@ -363,50 +243,19 @@ void Game::Draw(float deltaTime, float totalTime)
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f,
 		0);
-
-	// Send data to shader variables
-	//  - Do this ONCE PER OBJECT you're drawing
-	//  - This is actually a complex process of copying data to a local buffer
-	//    and then copying that entire buffer to the GPU.  
-	//  - The "SimpleShader" class handles all of that for you.
 	
-	// A3
+	pixelShader->SetData(
+		"light1",
+		&dirLight1,
+		sizeof(DirectionalLight));
+	pixelShader->SetData(
+		"light2",
+		&dirLight2,
+		sizeof(DirectionalLight));
 
-	// Loop through all entities and draw 
-	for each (GameEntity entity in entities)
+	for (int i = 0; i < gameEntities.size(); i++)
 	{
-		// Set entity specific data
-		entity.PrepareMaterial(camera.GetViewMatrix4x4(), camera.GetProjectionMatrix4x4());
-
-		// Set Light Data in PixelShader
-		pixelShader->SetData("light", &dirLight, sizeof(DirectionalLight));
-		pixelShader->SetData("light2", &dirLight2, sizeof(DirectionalLight2));
-
-		// Once you've set all of the data you care to change for
-		// the next draw call, you need to actually send it to the GPU
-		//  - If you skip this, the "SetMatrix" calls above won't make it to the GPU!
-		vertexShader->CopyAllBufferData();
-		pixelShader->CopyAllBufferData();
-
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame...YET
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		vertexShader->SetShader();
-		pixelShader->SetShader();
-
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-
-		ID3D11Buffer* entityVertexBuffer = entity.meshPtr->GetVertexBuffer();
-
-		context->IASetVertexBuffers(0, 1, &entityVertexBuffer, &stride, &offset);
-		context->IASetIndexBuffer(entity.meshPtr->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-
-		context->DrawIndexed(
-			entity.meshPtr->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-			0,     // Offset to the first index we want to use
-			0);    // Offset to add to each index when looking up verticesv
+		gameEntities[i]->Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix());
 	}
 
 	// Present the back buffer to the user
@@ -456,10 +305,13 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 // --------------------------------------------------------
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 {
-	// Add any custom code here...
-
-	// A4
-	camera.UpdateMouseRotation(x, y);
+	// Check left mouse button
+	if (buttonState & 0x0001)
+	{
+		float xDiff = (x - prevMousePos.x) * 0.001f;
+		float yDiff = (y - prevMousePos.y) * 0.001f;
+		camera->Rotate(yDiff, xDiff);
+	}
 
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;

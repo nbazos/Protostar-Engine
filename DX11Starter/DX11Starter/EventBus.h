@@ -10,15 +10,16 @@
 
 // EventBus Messaging System Based on Implementation from: https://medium.com/@savas/nomad-game-engine-part-7-the-event-system-45a809ccb68f
 
-class Event
-{
+class Event {
 protected:
-	virtual ~Event() {};
+	virtual ~Event() {}
 };
 
-struct InputEvent : public Event {
+struct InputEvent : public Event 
+{
 	InputEvent(std::string str): STR {str} {}
 	std::string STR;
+	~InputEvent() {}
 };
 
 // This is the interface for MemberFunctionHandler that each specialization will use
@@ -34,8 +35,7 @@ private:
 };
 
 template<class T, class EventType>
-class MemberFunctionHandler : public HandlerFunctionBase
-{
+class MemberFunctionHandler : public HandlerFunctionBase {
 public:
 	typedef void (T::*MemberFunction)(EventType*);
 
@@ -56,6 +56,19 @@ private:
 typedef std::list<HandlerFunctionBase*> HandlerList;
 class EventBus {
 public:
+	EventBus() {}
+	~EventBus() 
+	{
+		for (std::map<std::type_index, HandlerList*>::iterator itr = subscribers.begin(); itr != subscribers.end(); itr++)
+		{
+			// found it - delete it
+			if (typeid(itr->second) == typeid(HandlerList*))
+			{
+				delete itr->second;
+			}
+		}
+	}
+
 	template<typename EventType>
 	void publish(EventType * evnt) {
 		HandlerList * handlers = subscribers[typeid(EventType)];

@@ -3,30 +3,34 @@
 #include <DirectXMath.h>
 #include <Windows.h>
 
+// For the DirectX Math library
 using namespace DirectX;
 
-class Camera
-{
+class Camera {
 public:
-	Camera();
+	Camera(float x, float y, float z);
 	~Camera();
 
-	// member variables
-	XMFLOAT4X4 view4x4;
-	XMFLOAT4X4 projection4x4;
+	void MoveRelative(float x, float y, float z); // Moves the camera relative to its orientation
+	void MoveAbsolute(float x, float y, float z); // Moves the camera in world space
+	void Rotate(float xRot, float yRot);
 
-	XMFLOAT4X4 GetViewMatrix4x4();
-	XMFLOAT4X4 GetProjectionMatrix4x4();
-
-	XMFLOAT3 positionFloat3;
-	XMFLOAT3 directionFloat3;
-	float xRot;
-	float yRot;
-
-	// methods
 	void Update(float deltaTime);
-	void GetKeyboardInput(float deltaTime, XMVECTOR dir);
-	void UpdateMouseRotation(int xPixel, int yPixel);
-	void UpdateProjectionMatrix4x4(unsigned int width, unsigned int height);
-};
+	void UpdateViewMatrix();
+	void UpdateProjectionMatrix(float aspectRatio);
 
+	XMFLOAT4X4 GetViewMatrix() { return viewMatrix; };
+	XMFLOAT4X4 GetProjectionMatrix() { return projectionMatrix; };
+
+private:
+	XMFLOAT4X4 viewMatrix;
+	XMFLOAT4X4 projectionMatrix;
+
+	XMFLOAT3 startPosition;
+	XMFLOAT3 cameraPosition;
+	XMFLOAT4 cameraRotation;
+	float xRotation;
+	float yRotation;
+
+	void CheckInput(float moveSpeed);
+};

@@ -1,110 +1,108 @@
 #include "Camera.h"
+#include <stdio.h>
 
-
-
-Camera::Camera()
+Camera::Camera(float x, float y, float z)
 {
-	XMMATRIX W = XMMatrixIdentity();
+	// Set transformations
+	cameraPosition = XMFLOAT3(x, y, z);;
+	startPosition = cameraPosition;
+	XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
+	xRotation = 0;
+	yRotation = 0;
 
-	XMStoreFloat4x4(&view4x4, XMMatrixTranspose(W));
-
-	XMStoreFloat4x4(&projection4x4, XMMatrixTranspose(W));
-
-	positionFloat3 = {0, 0, -5.0f};
-	directionFloat3 = {0, 0, 1.0f};
-
-	yRot = 0;
-	xRot = 0;
+	// Set matricies
+	XMStoreFloat4x4(&viewMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&projectionMatrix, XMMatrixIdentity());
 }
 
-Camera::~Camera()
+Camera::~Camera() { }
+
+void Camera::MoveRelative(float x, float y, float z)
 {
+	// Rotate the desired movement vector
+	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&cameraRotation));
+
+	// Move in that direction
+	XMStoreFloat3(&cameraPosition, XMLoadFloat3(&cameraPosition) + dir);
 }
 
-XMFLOAT4X4 Camera::GetViewMatrix4x4()
+void Camera::MoveAbsolute(float x, float y, float z)
 {
-	return view4x4;
-}
-
-XMFLOAT4X4 Camera::GetProjectionMatrix4x4()
-{
-	return projection4x4;
+	cameraPosition.x += x;
+	cameraPosition.y += y;
+	cameraPosition.z += z;
 }
 
 void Camera::Update(float deltaTime)
 {
-	// calculate view matrix
-	XMVECTOR rotQuat = XMQuaternionRotationRollPitchYaw(xRot, yRot, 0.0f);
+	// Calculate speed & speed up or down with SHIFT or TAB
+	float speed = deltaTime * 3;
+	if (GetAsyncKeyState(VK_SHIFT)) { speed *= 5; }
+	if (GetAsyncKeyState(VK_TAB)) { speed *= 0.1f; }
 
-	XMVECTOR direction = XMVector3Rotate(XMLoadFloat3(&directionFloat3), rotQuat);
+	CheckInput(speed);
 
-	XMMATRIX view = XMMatrixLookToLH(XMLoadFloat3(&positionFloat3), direction, XMVectorSet(0, 1, 0, 0));
-
-	XMStoreFloat4x4(&view4x4, XMMatrixTranspose(view));
-
-	// get input
-	GetKeyboardInput(deltaTime, direction);
+	UpdateViewMatrix();
 }
 
-void Camera::GetKeyboardInput(float deltaTime, XMVECTOR dir)
+void Camera::Rotate(float xRot, float yRot)
 {
-	// Forward
-	if (GetAsyncKeyState('W') & 0x8000)
-	{
-		// Position + (Direction * dT)
-		XMStoreFloat3(&positionFloat3, XMVectorAdd(XMLoadFloat3(&positionFloat3), XMVectorScale(dir, deltaTime)));
-	}
+	// Adjust the current rotation
+	xRotation += xRot;
+	yRotation += yRot;
 
-	// Back
-	if (GetAsyncKeyState('S') & 0x8000)
-	{
-		// Position + -(Direction * dT)
-		XMStoreFloat3(&positionFloat3, XMVectorAdd(XMLoadFloat3(&positionFloat3), XMVectorNegate(XMVectorScale(dir, deltaTime))));
-	}
+	// Clamp the x between PI/2 and -PI/2
+	xRotation = max(min(xRotation, XM_PIDIV2), -XM_PIDIV2);
 
-	// Left
-	if (GetAsyncKeyState('A') & 0x8000)
-	{
-		// Position + (Cross(direction,up) * dT)
-		XMStoreFloat3(&positionFloat3, XMVectorAdd(XMLoadFloat3(&positionFloat3), XMVectorScale(XMVector3Cross(dir, XMVectorSet(0,1,0,0)), deltaTime)));
-	}
-
-	// Right
-	if (GetAsyncKeyState('D') & 0x8000)
-	{
-		// Position + -(Cross(direction,up) * dT)
-		XMStoreFloat3(&positionFloat3, XMVectorAdd(XMLoadFloat3(&positionFloat3), XMVectorNegate(XMVectorScale(XMVector3Cross(dir, XMVectorSet(0, 1, 0, 0)), deltaTime))));
-	}
-
-	// Up
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
-	{
-		// Position + 1 * dT
-		positionFloat3.y += 1 * deltaTime;
-	}
-
-	// Down
-	if (GetAsyncKeyState('X') & 0x8000)
-	{
-		// Position + -1 * dT
-		positionFloat3.y += -1 * deltaTime;
-	}
+	// Recreate the quaternion
+	XMStoreFloat4(&cameraRotation, XMQuaternionRotationRollPitchYaw(xRotation, yRotation, 0));
 }
 
-void Camera::UpdateMouseRotation(int xPixel, int yPixel)
+void Camera::UpdateViewMatrix()
 {
-	// scale down the pixel values as the they will be interpreted as radians
-	xRot = yPixel * 0.001f;
-	yRot = xPixel * 0.001f;
+	// Rotate the standard "forward" matrix by our rotation
+	// This gives us our "look direction"
+	XMVECTOR dir = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&cameraRotation));
+
+	XMMATRIX view = XMMatrixLookToLH(
+		XMLoadFloat3(&cameraPosition),
+		dir,
+		XMVectorSet(0, 1, 0, 0));
+
+	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(view));
 }
 
-void Camera::UpdateProjectionMatrix4x4(unsigned int width, unsigned int height)
+void Camera::UpdateProjectionMatrix(float aspectRatio)
 {
-	// Update our projection matrix since the window size changed
+	// Create the Projection matrix
+	// - This should match the window's aspect ratio, and also update anytime
+	//   the window resizes (which is already happening in OnResize() below)
 	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,	// Field of View Angle
-		(float)width / height,	// Aspect ratio
-		0.1f,				  	// Near clip plane distance
-		100.0f);			  	// Far clip plane distance
-	XMStoreFloat4x4(&projection4x4, XMMatrixTranspose(P)); // Transpose for HLSL!
+		0.25f * 3.1415926535f,		// Field of View Angle
+		aspectRatio,		// Aspect ratio
+		0.1f,						// Near clip plane distance
+		100.0f);					// Far clip plane distance
+	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
+}
+
+void Camera::CheckInput(float speed)
+{
+	// WASD use relative move to move in the direction of the current rotation
+	if (GetAsyncKeyState('W') & 0x8000) { MoveRelative(0, 0, speed); }
+	if (GetAsyncKeyState('S') & 0x8000) { MoveRelative(0, 0, -speed); }
+	if (GetAsyncKeyState('A') & 0x8000) { MoveRelative(-speed, 0, 0); }
+	if (GetAsyncKeyState('D') & 0x8000) { MoveRelative(speed, 0, 0); }
+
+	// Up & Down use absolute move
+	if (GetAsyncKeyState(VK_CONTROL) & 0x8000) { MoveAbsolute(0, -speed, 0); }
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000) { MoveAbsolute(0, speed, 0); }
+
+	// Check for reset
+	if (GetAsyncKeyState('R') & 0x8000)
+	{
+		cameraPosition = startPosition;
+		xRotation = 0;
+		xRotation = 0;
+		XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
+	}
 }

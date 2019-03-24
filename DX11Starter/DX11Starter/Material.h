@@ -2,23 +2,20 @@
 
 #include "SimpleShader.h"
 
-class Material
-{
+class Material {
 public:
-	Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11ShaderResourceView* srvPtr, ID3D11SamplerState* samplerStatePtr);
-	Material();
+	Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11ShaderResourceView* srv, ID3D11SamplerState* sampler);
 	~Material();
 
-	// member variables
+	SimpleVertexShader* GetVertexShader() { return vertexShader; };
+	SimplePixelShader* GetPixelShader() { return pixelShader; };
+	ID3D11ShaderResourceView* GetSRV() { return textureSRV; };
+	ID3D11SamplerState* GetSamplerState() { return samplerState; };
+
+private:
+	// Wrappers for DirectX shaders to provide simplified functionality
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
-
-	ID3D11ShaderResourceView* srvPtr;
-	ID3D11SamplerState* samplerStatePtr;
-
-	// getters
-	SimpleVertexShader* GetVertexShader();
-	SimplePixelShader* GetPixelShader();
-
+	ID3D11ShaderResourceView* textureSRV;
+	ID3D11SamplerState* samplerState;
 };
-

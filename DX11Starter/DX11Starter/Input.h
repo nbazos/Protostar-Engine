@@ -3,8 +3,7 @@
 #include <Windows.h>
 #include "System.h"
 
-class Input : public System
-{
+class Input : public System {
 public:
 	Input();
 	Input(EventBus * eventBusPtr) : System(eventBusPtr) {}

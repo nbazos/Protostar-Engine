@@ -2,8 +2,7 @@
 
 #include "EventBus.h"
 
-class System
-{
+class System {
 public:
 	System() {}
 	System(EventBus * eventBusPtr)

@@ -3,8 +3,7 @@
 #include "System.h"
 #include <iostream>
 
-class PlayerEntity : public System 
-{
+class PlayerEntity : public System {
 public:
 	PlayerEntity();
 	PlayerEntity(EventBus * eventBusPtr) : System(eventBusPtr) {}

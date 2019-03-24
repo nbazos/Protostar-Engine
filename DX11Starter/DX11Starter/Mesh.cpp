@@ -1,19 +1,14 @@
 #include "Mesh.h"
-#include <DirectXMath.h>
-#include <fstream>
-#include <vector>
-using namespace DirectX;
 
-Mesh::Mesh(Vertex * verticePtr, int verticeCount, unsigned int * indicePtr, int indiceCount, ID3D11Device * devicePtr)
+Mesh::Mesh(Vertex* vertices, int numVerts, unsigned int * indices, int numInds, ID3D11Device * device)
 {
-	indexBufferCount = indiceCount;
-	CreateBuffers(verticePtr, verticeCount, indicePtr, indiceCount, devicePtr);	
+	CreateBuffers(vertices, numVerts, indices, numInds, device);
 }
 
-Mesh::Mesh(char * objFile, ID3D11Device * devicePtr)
+Mesh::Mesh(char * filename, ID3D11Device* device)
 {
 	// File input object
-	std::ifstream obj(objFile);
+	std::ifstream obj(filename);
 
 	// Check for successful open
 	if (!obj.is_open())
@@ -28,7 +23,7 @@ Mesh::Mesh(char * objFile, ID3D11Device * devicePtr)
 	unsigned int vertCounter = 0;        // Count of vertices/indices
 	char chars[100];                     // String for line reading
 
-										 // Still have data left?
+	// Still have data left?
 	while (obj.good())
 	{
 		// Get the line (100 characters should be more than enough)
@@ -179,39 +174,39 @@ Mesh::Mesh(char * objFile, ID3D11Device * devicePtr)
 	// - Yes, the indices are a bit redundant here (one per vertex).  Could you skip using
 	//    an index buffer in this case?  Sure!  Though, if your mesh class assumes you have
 	//    one, you'll need to write some extra code to handle cases when you don't.
-
-	indexBufferCount = vertCounter;
-	CreateBuffers(&verts[0], vertCounter, &indices[0], vertCounter, devicePtr);
+	CreateBuffers(&verts[0], vertCounter, &indices[0], vertCounter, device);
 }
 
 Mesh::~Mesh()
 {
-	indexBuffer->Release();
-	vertexBuffer->Release();
+	// Release any (and all!) DirectX objects
+	// we've made in the Game class
+	if (vertexBuffer) { vertexBuffer->Release(); }
+	if (indexBuffer) { indexBuffer->Release(); }
 }
 
-void Mesh::CreateBuffers(Vertex * verticePtr, int verticeCount, unsigned int * indicePtr, int indiceCount, ID3D11Device * devicePtr)
+void Mesh::CreateBuffers(Vertex * vertices, int numVerts, unsigned int * indices, int numInds, ID3D11Device * device)
 {
 	// Create the VERTEX BUFFER description -----------------------------------
 	// - The description is created on the stack because we only need
 	//    it to create the buffer.  The description is then useless.
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * verticeCount;       // 3 = number of vertices in the buffer
+	vbd.ByteWidth = sizeof(Vertex) * numVerts;       // 3 = number of vertices in the buffer
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // Tells DirectX this is a vertex buffer
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
 
-
 	// Create the proper struct to hold the initial vertex data
 	// - This is how we put the initial data into the buffer
 	D3D11_SUBRESOURCE_DATA initialVertexData;
-	initialVertexData.pSysMem = verticePtr;
+	initialVertexData.pSysMem = vertices;
 
 	// Actually create the buffer with the initial data
 	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
-	devicePtr->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer);
+	device->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer);
+
 
 
 	// Create the INDEX BUFFER description ------------------------------------
@@ -219,34 +214,19 @@ void Mesh::CreateBuffers(Vertex * verticePtr, int verticeCount, unsigned int * i
 	//    it to create the buffer.  The description is then useless.
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(int) * indiceCount;         // 3 = number of indices in the buffer
+	ibd.ByteWidth = sizeof(int) * numInds;         // 3 = number of indices in the buffer
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER; // Tells DirectX this is an index buffer
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
 	ibd.StructureByteStride = 0;
 
-
 	// Create the proper struct to hold the initial index data
 	// - This is how we put the initial data into the buffer
 	D3D11_SUBRESOURCE_DATA initialIndexData;
-	initialIndexData.pSysMem = indicePtr;
+	initialIndexData.pSysMem = indices;
+	numIndices = numInds;
 
 	// Actually create the buffer with the initial data
 	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
-	devicePtr->CreateBuffer(&ibd, &initialIndexData, &indexBuffer);
-}
-
-ID3D11Buffer * Mesh::GetVertexBuffer()
-{
-	return vertexBuffer;
-}
-
-ID3D11Buffer * Mesh::GetIndexBuffer()
-{
-	return indexBuffer;
-}
-
-int Mesh::GetIndexCount()
-{
-	return indexBufferCount;
+	device->CreateBuffer(&ibd, &initialIndexData, &indexBuffer);
 }

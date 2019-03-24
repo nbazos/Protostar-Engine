@@ -3,45 +3,35 @@
 #include <DirectXMath.h>
 #include "Mesh.h"
 #include "Material.h"
-#include "Lights.h"
 
+// For the DirectX Math library
 using namespace DirectX;
 
-// To be replaced with Israel's version
-
-class GameEntity
-{
+class GameEntity {
 public:
-	GameEntity(Mesh* meshPtr, Material* materialPtr);
-	GameEntity();
+	GameEntity(Mesh* mesh, Material* material, ID3D11DeviceContext* context);
 	~GameEntity();
 
-	// Member variables
+	void SetWorldMatrix();
+	void SetPosition(float posX, float posY, float posZ);
+	void SetScale(float scalar);
+	void SetRotation(float rotX, float rotY, float rotZ);
+
+	DirectX::XMFLOAT3 GetScale() { return scale; };
+	DirectX::XMFLOAT3 GetRotation() { return rotation; };
+	DirectX::XMFLOAT3 GetPosition() { return position; };
+	DirectX::XMFLOAT4X4 GetWorldMatrix() { return worldMatrix; };
+
+	void Draw(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat);
+private:
 	XMFLOAT4X4 worldMatrix;
+	XMFLOAT3 position;
+	XMFLOAT3 scale;
+	XMFLOAT3 rotation;
 
-	XMFLOAT4X4 trans4X4;
-	XMFLOAT4X4 scale4X4;
-	XMFLOAT4X4 rot4X4; // Quaternion Matrix
+	Mesh* entityMesh;
+	Material* entityMaterial;
+	ID3D11DeviceContext* deviceContext;
 
-	Mesh* meshPtr;
-	Material* materialPtr;
-
-	// getters
-	XMFLOAT4X4 GetWorldMatrix();
-	XMFLOAT4X4 GetTranslationMatrix4X4();
-	XMFLOAT4X4 GetScaleMatrix4X4();
-	XMFLOAT4X4 GetRotMatrix4X4();
-	Mesh* GetMeshPtr();
-
-	// calculate world matrix for this entity
-	void CalculateWorldMatrix();
-
-	// setters
-	void SetTranslationMatrix4X4(XMMATRIX position);
-	void SetScaleMatrix4X4(XMMATRIX scale);
-	void SetRotMatrix4X4(XMMATRIX rot);
-
-	// prepare entity material
-	void PrepareMaterial(XMFLOAT4X4 cameraView, XMFLOAT4X4 cameraProjection);
+	void PrepareMaterials(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat);
 };
-
