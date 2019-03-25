@@ -10,6 +10,27 @@
 
 // EventBus Messaging System Based on Implementation from: https://medium.com/@savas/nomad-game-engine-part-7-the-event-system-45a809ccb68f
 
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
+// Macro for DBG_NEW
+
+// compile by using: cl /EHsc /W4 /D_DEBUG /MDd debug_new.cpp
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 class Event {
 protected:
 	virtual ~Event() {}
@@ -65,8 +86,11 @@ public:
 			if (typeid(itr->second) == typeid(HandlerList*))
 			{
 				delete itr->second;
+
+				// _CrtDumpMemoryLeaks();
 			}
 		}
+		
 	}
 
 	template<typename EventType>
@@ -90,11 +114,11 @@ public:
 
 		//First time initialization
 		if (handlers == nullptr) {
-			handlers = new HandlerList();
+			handlers = DBG_NEW HandlerList();
 			subscribers[typeid(EventType)] = handlers;
 		}
 
-		handlers->push_back(new MemberFunctionHandler<T, EventType>(instance, memberFunction));
+		handlers->push_back(DBG_NEW MemberFunctionHandler<T, EventType>(instance, memberFunction));
 	}
 private:
 	std::map<std::type_index, HandlerList*> subscribers;
