@@ -10,12 +10,12 @@ Input::~Input()
 
 void Input::getInput()
 {
-	if (GetAsyncKeyState('A') & 0x800)
+	if (GetKeyState('A') & 0x800)
 	{
-		eventBus->publish(new InputEvent("Moving Left"));
+		eventBus->publish(DBG_NEW InputEvent("Moving Left"));
 	}
-	if (GetAsyncKeyState('D') & 0x800)
+	if (GetKeyState('D') & 0x800)
 	{
-		eventBus->publish(new InputEvent("Moving Right"));
+		eventBus->publish(DBG_NEW InputEvent("Moving Right"));
 	}
 }

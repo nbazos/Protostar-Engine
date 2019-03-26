@@ -85,12 +85,14 @@ public:
 			// found it - delete it
 			if (typeid(itr->second) == typeid(HandlerList*))
 			{
+				for (auto itrj = itr->second->begin(); itrj != itr->second->end(); ++itrj)
+				{
+					HandlerFunctionBase* child = *itrj;
+					delete child;
+				}
 				delete itr->second;
-
-				// _CrtDumpMemoryLeaks();
 			}
 		}
-		
 	}
 
 	template<typename EventType>
@@ -118,6 +120,7 @@ public:
 			subscribers[typeid(EventType)] = handlers;
 		}
 
+		// 'new' makes this redundant because it becomes ptrs to ptrs
 		handlers->push_back(DBG_NEW MemberFunctionHandler<T, EventType>(instance, memberFunction));
 	}
 private:
