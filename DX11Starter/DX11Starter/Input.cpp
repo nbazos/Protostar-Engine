@@ -12,10 +12,16 @@ void Input::getInput()
 {
 	if (GetKeyState('A') & 0x800)
 	{
-		eventBus->publish(DBG_NEW InputEvent("Moving Left"));
+		InputEvent * ie = DBG_NEW InputEvent("Moving Left");
+		// eventBus->publish(DBG_NEW InputEvent("Moving Left"));
+		eventBus->publish(ie);
+		delete ie;
 	}
 	if (GetKeyState('D') & 0x800)
 	{
-		eventBus->publish(DBG_NEW InputEvent("Moving Right"));
+		InputEvent * ie = DBG_NEW InputEvent("Moving Right");
+		// eventBus->publish(DBG_NEW InputEvent("Moving Right"));
+		eventBus->publish(ie);
+		delete ie;
 	}
 }
