@@ -29,6 +29,7 @@ struct SimpleShaderVariable
 struct SimpleConstantBuffer
 {
 	std::string Name;
+	D3D_CBUFFER_TYPE Type;
 	unsigned int Size;
 	unsigned int BindIndex;
 	ID3D11Buffer* ConstantBuffer;
@@ -57,8 +58,7 @@ struct SimpleSampler
 // --------------------------------------------------------
 // Base abstract class for simplifying shader handling
 // --------------------------------------------------------
-class ISimpleShader
-{
+class ISimpleShader {
 public:
 	ISimpleShader(ID3D11Device* device, ID3D11DeviceContext* context);
 	virtual ~ISimpleShader();
@@ -147,8 +147,7 @@ protected:
 // --------------------------------------------------------
 // Derived class for VERTEX shaders ///////////////////////
 // --------------------------------------------------------
-class SimpleVertexShader : public ISimpleShader
-{
+class SimpleVertexShader : public ISimpleShader {
 public:
 	SimpleVertexShader(ID3D11Device* device, ID3D11DeviceContext* context);
 	SimpleVertexShader(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11InputLayout* inputLayout, bool perInstanceCompatible);
@@ -173,8 +172,7 @@ protected:
 // --------------------------------------------------------
 // Derived class for PIXEL shaders ////////////////////////
 // --------------------------------------------------------
-class SimplePixelShader : public ISimpleShader
-{
+class SimplePixelShader : public ISimpleShader {
 public:
 	SimplePixelShader(ID3D11Device* device, ID3D11DeviceContext* context);
 	~SimplePixelShader();
@@ -193,8 +191,7 @@ protected:
 // --------------------------------------------------------
 // Derived class for DOMAIN shaders ///////////////////////
 // --------------------------------------------------------
-class SimpleDomainShader : public ISimpleShader
-{
+class SimpleDomainShader : public ISimpleShader {
 public:
 	SimpleDomainShader(ID3D11Device* device, ID3D11DeviceContext* context);
 	~SimpleDomainShader();
@@ -213,8 +210,7 @@ protected:
 // --------------------------------------------------------
 // Derived class for HULL shaders /////////////////////////
 // --------------------------------------------------------
-class SimpleHullShader : public ISimpleShader
-{
+class SimpleHullShader : public ISimpleShader {
 public:
 	SimpleHullShader(ID3D11Device* device, ID3D11DeviceContext* context);
 	~SimpleHullShader();
@@ -233,8 +229,7 @@ protected:
 // --------------------------------------------------------
 // Derived class for GEOMETRY shaders /////////////////////
 // --------------------------------------------------------
-class SimpleGeometryShader : public ISimpleShader
-{
+class SimpleGeometryShader : public ISimpleShader {
 public:
 	SimpleGeometryShader(ID3D11Device* device, ID3D11DeviceContext* context, bool useStreamOut = 0, bool allowStreamOutRasterization = 0);
 	~SimpleGeometryShader();
@@ -269,8 +264,7 @@ protected:
 // --------------------------------------------------------
 // Derived class for COMPUTE shaders //////////////////////
 // --------------------------------------------------------
-class SimpleComputeShader : public ISimpleShader
-{
+class SimpleComputeShader : public ISimpleShader {
 public:
 	SimpleComputeShader(ID3D11Device* device, ID3D11DeviceContext* context);
 	~SimpleComputeShader();

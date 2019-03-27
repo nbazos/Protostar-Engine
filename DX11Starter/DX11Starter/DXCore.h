@@ -8,8 +8,7 @@
 // instead of in Visual Studio settings if we want
 #pragma comment(lib, "d3d11.lib")
 
-class DXCore
-{
+class DXCore {
 public:
 	DXCore(
 		HINSTANCE hInstance,		// The application's handle

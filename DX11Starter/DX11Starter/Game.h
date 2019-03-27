@@ -2,12 +2,17 @@
 
 #include "DXCore.h"
 #include "SimpleShader.h"
+#include "Mesh.h"
+#include "Lights.h"
+#include "GameEntity.h"
+#include "Camera.h"
 #include <DirectXMath.h>
+#include "EventBus.h"
+#include "Input.h"
+#include "PlayerEntity.h"
 
-class Game 
-	: public DXCore
-{
 
+class Game : public DXCore {
 public:
 	Game(HINSTANCE hInstance);
 	~Game();
@@ -27,25 +32,33 @@ public:
 private:
 
 	// Initialization helper methods - feel free to customize, combine, etc.
-	void LoadShaders(); 
-	void CreateMatrices();
+	void LoadShaders();
+	void CreateMaterials();
 	void CreateBasicGeometry();
-
-	// Buffers to hold actual geometry data
-	ID3D11Buffer* vertexBuffer;
-	ID3D11Buffer* indexBuffer;
 
 	// Wrappers for DirectX shaders to provide simplified functionality
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
 
-	// The matrices to go from model space to screen space
-	DirectX::XMFLOAT4X4 worldMatrix;
-	DirectX::XMFLOAT4X4 viewMatrix;
-	DirectX::XMFLOAT4X4 projectionMatrix;
+	Material* material1;
+	Material* material2;
+	ID3D11ShaderResourceView* brickSRV;
+	ID3D11ShaderResourceView* grassSRV;
+	ID3D11SamplerState* sampler;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
+
+	std::vector<Mesh*> meshes;
+	std::vector<GameEntity*> gameEntities;
+	Camera* camera;
+	DirectionalLight dirLight1;
+	DirectionalLight dirLight2;
+
+	// Engine systems
+	EventBus eventBus;
+	Input inputSystem;
+	PlayerEntity playerEntitySystem;
 };
 

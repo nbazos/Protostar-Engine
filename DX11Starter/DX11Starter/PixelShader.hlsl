@@ -12,8 +12,43 @@ struct VertexToPixel
 	//  |    |                |
 	//  v    v                v
 	float4 position		: SV_POSITION;
-	float4 color		: COLOR;
+	float3 normal       : NORMAL;
+	float2 uv           : TEXCOORD;
 };
+
+struct DirectionalLight
+{
+	float4 AmbientColor;
+	float4 DiffuseColor;
+	float3 Direction;
+};
+
+// Constant Buffer
+// - Allows us to define a buffer of individual variables 
+//    which will (eventually) hold data from our C++ code
+// - All non-pipeline variables that get their values from 
+//    our C++ code must be defined inside a Constant Buffer
+// - The name of the cbuffer itself is unimportant
+cbuffer externalData : register(b0)
+{
+	DirectionalLight light1;
+	DirectionalLight light2;
+};
+
+// Global variables
+Texture2D diffuseTexture  : register(t0);
+SamplerState basicSampler : register(s0);
+
+// Helper Functions
+float4 CalculateLightColor(float3 normal, DirectionalLight light)
+{
+	normal = normalize(normal);
+	float3 normalizedDir = normalize(-light.Direction);
+	float lightAmount = dot(normal, normalizedDir);
+	lightAmount = saturate(lightAmount);
+
+	return (light.DiffuseColor * lightAmount) + light.AmbientColor;
+}
 
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
@@ -26,9 +61,6 @@ struct VertexToPixel
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	// Just return the input color
-	// - This color (like most values passing through the rasterizer) is 
-	//   interpolated for each pixel between the corresponding vertices 
-	//   of the triangle we're rendering
-	return input.color;
+	return diffuseTexture.Sample(basicSampler, input.uv) * CalculateLightColor(input.normal, light1) + CalculateLightColor(input.normal, light2);
 }
+
