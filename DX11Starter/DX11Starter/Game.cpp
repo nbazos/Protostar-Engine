@@ -78,6 +78,7 @@ void Game::Init()
 	CreateMaterials();
 	CreateBasicGeometry();	
 
+	// Engine Subsystem & Communication Initialization
 	eventBus = EventBus();
 	inputSystem = Input(&eventBus);
 	playerEntitySystem = PlayerEntity(&eventBus);
@@ -149,8 +150,6 @@ void Game::CreateMaterials()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	
-
 	Mesh* torusMesh = new Mesh("../../Assets/Models/torus.obj", device); // create triangle mesh
 	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
 	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
