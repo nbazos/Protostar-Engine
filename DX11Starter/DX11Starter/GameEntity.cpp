@@ -1,7 +1,8 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity(Mesh* mesh, Material* material, ID3D11DeviceContext* context)
+GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context)
 {
+	entityName = name;
 	entityMesh = mesh;
 	entityMaterial = material;
 	deviceContext = context;
@@ -34,11 +35,11 @@ void GameEntity::SetPosition(float posX, float posY, float posZ)
 	position.z = posZ;
 }
 
-void GameEntity::SetScale(float scalar)
+void GameEntity::SetScale(float scaleX, float scaleY, float scaleZ)
 {
-	scale.x = scalar;
-	scale.y = scalar;
-	scale.z = scalar;
+	scale.x = scaleX;
+	scale.y = scaleY;
+	scale.z = scaleZ;
 }
 
 void GameEntity::SetRotation(float pitch, float yaw, float roll)
@@ -46,6 +47,13 @@ void GameEntity::SetRotation(float pitch, float yaw, float roll)
 	rotation.x = pitch * XM_PI / 180;
 	rotation.y = yaw * XM_PI / 180;
 	rotation.z = roll * XM_PI / 180;
+}
+
+void GameEntity::MoveAbsolute(float translationX, float translationY, float translationZ)
+{
+	position.x += translationX;
+	position.y += translationY;
+	position.z += translationZ;
 }
 
 void GameEntity::Draw(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat)
@@ -64,6 +72,8 @@ void GameEntity::Draw(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat)
 
 void GameEntity::PrepareMaterials(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat)
 {
+	SetWorldMatrix(); // Recalculate world matrix 
+
 	// Send data to shader variables
 	entityMaterial->GetVertexShader()->SetMatrix4x4("world", worldMatrix);
 	entityMaterial->GetVertexShader()->SetMatrix4x4("view", viewMat);

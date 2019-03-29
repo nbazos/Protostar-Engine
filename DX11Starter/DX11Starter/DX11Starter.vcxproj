@@ -119,20 +119,21 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="PlayerEntity.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DXCore.h" />
     <ClInclude Include="EventBus.h" />
+    <ClInclude Include="Events.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="PlayerEntity.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Vertex.h" />

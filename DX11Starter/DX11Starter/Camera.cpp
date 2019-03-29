@@ -40,7 +40,7 @@ void Camera::Update(float deltaTime)
 	if (GetAsyncKeyState(VK_SHIFT)) { speed *= 5; }
 	if (GetAsyncKeyState(VK_TAB)) { speed *= 0.1f; }
 
-	CheckInput(speed);
+	//CheckInput(speed);
 
 	UpdateViewMatrix();
 }

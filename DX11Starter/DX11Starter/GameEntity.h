@@ -9,12 +9,12 @@ using namespace DirectX;
 
 class GameEntity {
 public:
-	GameEntity(Mesh* mesh, Material* material, ID3D11DeviceContext* context);
+	GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context);
 	~GameEntity();
 
 	void SetWorldMatrix();
 	void SetPosition(float posX, float posY, float posZ);
-	void SetScale(float scalar);
+	void SetScale(float scaleX, float scaleY, float scaleZ);
 	void SetRotation(float rotX, float rotY, float rotZ);
 
 	DirectX::XMFLOAT3 GetScale() { return scale; };
@@ -22,7 +22,10 @@ public:
 	DirectX::XMFLOAT3 GetPosition() { return position; };
 	DirectX::XMFLOAT4X4 GetWorldMatrix() { return worldMatrix; };
 
+	void MoveAbsolute(float translationX, float translationY, float translationZ);
 	void Draw(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat);
+
+	const char * entityName;
 private:
 	XMFLOAT4X4 worldMatrix;
 	XMFLOAT3 position;

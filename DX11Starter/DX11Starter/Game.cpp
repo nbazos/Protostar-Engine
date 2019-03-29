@@ -76,15 +76,15 @@ void Game::Init()
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
 	CreateMaterials();
-	CreateBasicGeometry();	
 
 	eventBus = EventBus();
 	inputSystem = Input(&eventBus);
-	playerEntitySystem = PlayerEntity(&eventBus);
-	playerEntitySystem.init();
+	sceneManager = SceneManager(&eventBus);
+	sceneManager.Init();
+	CreateBasicGeometry();	
 
 	// Create camera & initial projection matrix
-	camera = new Camera(0.0f, 0.0f, -5.0f);
+	camera = new Camera(0.0f, 0.0f, -10.0f);
 	camera->UpdateProjectionMatrix((float)width / height);
 
 	// Define directional lights for the scene
@@ -149,52 +149,27 @@ void Game::CreateMaterials()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	
-
-	Mesh* torusMesh = new Mesh("../../Assets/Models/torus.obj", device); // create triangle mesh
 	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
 	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
-	Mesh* helixMesh = new Mesh("../../Assets//Models/helix.obj", device);
-	Mesh* sphereMesh = new Mesh("../../Assets/Models/sphere.obj", device);
-	meshes.push_back(torusMesh);
+
 	meshes.push_back(cubeMesh);
 	meshes.push_back(coneMesh);
-	meshes.push_back(helixMesh);
-	meshes.push_back(sphereMesh);
 
 	// Create GameEntities that utilize the meshes
-	GameEntity* torus = new GameEntity(torusMesh, material1, context);
-	GameEntity* cube = new GameEntity(cubeMesh, material1, context);
-	GameEntity* cone = new GameEntity(coneMesh, material1, context);
-	GameEntity* helix = new GameEntity(helixMesh, material2, context);
-	GameEntity* sphere = new GameEntity(sphereMesh, material2, context);
-	gameEntities.push_back(torus);
-	gameEntities.push_back(cube);
-	gameEntities.push_back(cone);
-	gameEntities.push_back(helix);
-	gameEntities.push_back(sphere);
+	GameEntity cube = GameEntity("Player", cubeMesh, material1, context);
+	GameEntity cone = GameEntity("Floor", coneMesh, material1, context);
 
 	// Set transformations
-	torus->SetPosition(-3, -1, 0);
-	torus->SetScale(0.5);
-	torus->SetWorldMatrix();
+	cone.SetScale(0.5, 0.5f, 0.5f);
+	cone.SetPosition(2, -1, 0);
+		
+	cube.SetScale(1.0f, 1.0f, 1.0f);
+	cube.SetPosition(0, -2, 0);
+	cube.SetRotation(0.0f, 0.0f, 0.0f);
 
-	cube->SetScale(0.5);
-	cube->SetPosition(-1, 0, 0);
-	cube->SetRotation(0.0f, 45.0f, 0.0f);
-	cube->SetWorldMatrix();
+	sceneManager.AddEntityToScene(cone); // Player must be first entity in scene manager collection
+	sceneManager.AddEntityToScene(cube);
 
-	cone->SetScale(0.5);
-	cone->SetPosition(2, -1, 0);
-	cone->SetWorldMatrix();
-
-	helix->SetScale(0.5);
-	helix->SetPosition(3, 1, 0);
-	helix->SetWorldMatrix();
-
-	sphere->SetScale(0.5);
-	sphere->SetPosition(0.5, 0, 0);
-	sphere->SetWorldMatrix();
 }
 
 
@@ -219,11 +194,11 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	inputSystem.getInput();
+	inputSystem.GetInput();
 
 	// Update Camera
 	camera->Update(deltaTime);
-
+	sceneManager.Update(deltaTime, totalTime);
 }
 
 // --------------------------------------------------------
@@ -253,9 +228,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		&dirLight2,
 		sizeof(DirectionalLight));
 
-	for (int i = 0; i < gameEntities.size(); i++)
+	for (int i = 0; i < sceneManager.GetSceneEntities().size(); i++)
 	{
-		gameEntities[i]->Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+		sceneManager.GetSceneEntities()[i].Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix());
 	}
 
 	// Present the back buffer to the user

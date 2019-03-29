@@ -9,7 +9,7 @@
 #include <DirectXMath.h>
 #include "EventBus.h"
 #include "Input.h"
-#include "PlayerEntity.h"
+#include "SceneManager.h"
 
 
 class Game : public DXCore {
@@ -59,6 +59,6 @@ private:
 	// Engine systems
 	EventBus eventBus;
 	Input inputSystem;
-	PlayerEntity playerEntitySystem;
+	SceneManager sceneManager;
 };
 

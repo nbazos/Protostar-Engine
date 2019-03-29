@@ -8,20 +8,28 @@ Input::~Input()
 {
 }
 
-void Input::getInput()
+void Input::Init()
 {
-	if (GetKeyState('A') & 0x800)
+}
+
+void Input::GetInput()
+{
+	if (GetKeyState(VK_F3))
 	{
-		InputEvent * ie = DBG_NEW InputEvent("Moving Left");
-		// eventBus->publish(DBG_NEW InputEvent("Moving Left"));
-		eventBus->publish(ie);
+		cameraControlMode = !cameraControlMode;
+		std::cout << cameraControlMode << std::endl;
+	}
+
+	if (GetKeyState('A') & 0x800 && !cameraControlMode)
+	{
+		InputMoveLeft * ie = DBG_NEW InputMoveLeft();
+		eventBus->Publish(ie);
 		delete ie;
 	}
 	if (GetKeyState('D') & 0x800)
 	{
-		InputEvent * ie = DBG_NEW InputEvent("Moving Right");
-		// eventBus->publish(DBG_NEW InputEvent("Moving Right"));
-		eventBus->publish(ie);
+		InputMoveRight * ie = DBG_NEW InputMoveRight();
+		eventBus->Publish(ie);
 		delete ie;
 	}
 }
