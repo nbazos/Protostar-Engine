@@ -1,9 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
 
-// DirectX Tool Kit headers
-#include "WICTextureLoader.h" // WIC = Windows Imaging Component
-
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -23,15 +20,6 @@ Game::Game(HINSTANCE hInstance)
 		720,			// Height of the window's client area
 		true)			// Show extra stats (fps) in title bar?
 {
-	// Initialize fields
-	vertexShader = 0;
-	pixelShader = 0;
-	camera = 0;
-	material1 = 0;
-	material2 = 0;
-	brickSRV = 0;
-	grassSRV = 0;
-	sampler = 0;
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -48,21 +36,7 @@ Game::Game(HINSTANCE hInstance)
 // --------------------------------------------------------
 Game::~Game()
 {
-	// Delete our simple shader objects, which
-	// will clean up their own internal DirectX stuff
-	delete vertexShader;
-	delete pixelShader;
-	delete camera;
-
-	delete material1;
-	delete material2;
-	brickSRV->Release();
-	grassSRV->Release();
-	sampler->Release();
-
-	// Delete Meshes & GameEntities
-	for (auto& m : meshes) delete m;
-	for (auto& e : gameEntities) delete e;
+	
 }
 
 // --------------------------------------------------------
@@ -71,107 +45,14 @@ Game::~Game()
 // --------------------------------------------------------
 void Game::Init()
 {
-	// Helper methods for loading shaders, creating some basic
-	// geometry to draw and some simple camera matrices.
-	//  - You'll be expanding and/or replacing these later
-	LoadShaders();
-	CreateMaterials();
-
+	// Engine Subsystem & CommunicationI nitialization
 	eventBus = EventBus();
+	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain);
+	renderSystem.Init();
 	inputSystem = Input(&eventBus);
 	sceneManager = SceneManager(&eventBus);
 	sceneManager.Init();
-	CreateBasicGeometry();	
-
-	// Create camera & initial projection matrix
-	camera = new Camera(0.0f, 0.0f, -10.0f);
-	camera->UpdateProjectionMatrix((float)width / height);
-
-	// Define directional lights for the scene
-	dirLight1 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f)};
-	dirLight2 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)};
-
-	// Tell the input assembler stage of the pipeline what kind of
-	// geometric primitives (points, lines or triangles) we want to draw.  
-	// Essentially: "What kind of shape should the GPU draw with our data?"
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
-
-// --------------------------------------------------------
-// Loads shaders from compiled shader object (.cso) files using
-// my SimpleShader wrapper for DirectX shader manipulation.
-// - SimpleShader provides helpful methods for sending
-//   data to individual variables on the GPU
-// --------------------------------------------------------
-void Game::LoadShaders()
-{
-	vertexShader = new SimpleVertexShader(device, context);
-	vertexShader->LoadShaderFile(L"VertexShader.cso");
-
-	pixelShader = new SimplePixelShader(device, context);
-	pixelShader->LoadShaderFile(L"PixelShader.cso");
-}
-
-void Game::CreateMaterials()
-{
-	// Load textures
-	CreateWICTextureFromFile(
-		device,					// The Direct3D device for resource creation
-		context,				// Rendering context (this will auto-generate mip maps!!!)
-		L"../../Assets/Textures/round_brick.jpg",	// Path to the file ("L" means wide characters)
-		0,						// Texture ref?  No thanks!  (0 means we don't want an extra ref)
-		&brickSRV);				// Actual SRV for use with shaders
-
-	CreateWICTextureFromFile(
-		device,					// The Direct3D device for resource creation
-		context,				// Rendering context (this will auto-generate mip maps!!!)
-		L"../../Assets/Textures/grass.jpg",	// Path to the file ("L" means wide characters)
-		0,						// Texture ref?  No thanks!  (0 means we don't want an extra ref)
-		&grassSRV);
-
-	// Create sampler state
-	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.MaxAnisotropy = 16;
-	device->CreateSamplerState(&samplerDesc, &sampler);
-
-	material1 = new Material(vertexShader, pixelShader, brickSRV, sampler);
-	material2 = new Material(vertexShader, pixelShader, grassSRV, sampler);
-}
-
-
-// --------------------------------------------------------
-// Creates the geometry we're going to draw - a single triangle for now
-// --------------------------------------------------------
-void Game::CreateBasicGeometry()
-{
-	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
-	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
-
-	meshes.push_back(cubeMesh);
-	meshes.push_back(coneMesh);
-
-	// Create GameEntities that utilize the meshes
-	GameEntity cube = GameEntity("Player", cubeMesh, material1, context);
-	GameEntity cone = GameEntity("Floor", coneMesh, material1, context);
-
-	// Set transformations
-	cone.SetScale(0.5, 0.5f, 0.5f);
-	cone.SetPosition(2, -1, 0);
-		
-	cube.SetScale(1.0f, 1.0f, 1.0f);
-	cube.SetPosition(0, -2, 0);
-	cube.SetRotation(0.0f, 0.0f, 0.0f);
-
-	sceneManager.AddEntityToScene(cone); // Player must be first entity in scene manager collection
-	sceneManager.AddEntityToScene(cube);
-
-}
-
 
 // --------------------------------------------------------
 // Handle resizing DirectX "stuff" to match the new window size.
@@ -182,7 +63,8 @@ void Game::OnResize()
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
 
-	camera->UpdateProjectionMatrix((float)width / height);
+	renderSystem.AdjustCameraProjectionOnResize();
+	// camera->UpdateProjectionMatrix((float)width / height);
 }
 
 // --------------------------------------------------------
@@ -195,10 +77,8 @@ void Game::Update(float deltaTime, float totalTime)
 		Quit();
 
 	inputSystem.GetInput();
-
-	// Update Camera
-	camera->Update(deltaTime);
 	sceneManager.Update(deltaTime, totalTime);
+	renderSystem.Update(deltaTime, totalTime);
 }
 
 // --------------------------------------------------------
@@ -206,39 +86,8 @@ void Game::Update(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void Game::Draw(float deltaTime, float totalTime)
 {
-	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-	// Clear the render target and depth buffer (erases what's on the screen)
-	//  - Do this ONCE PER FRAME
-	//  - At the beginning of Draw (before drawing *anything*)
-	context->ClearRenderTargetView(backBufferRTV, color);
-	context->ClearDepthStencilView(
-		depthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		1.0f,
-		0);
-	
-	pixelShader->SetData(
-		"light1",
-		&dirLight1,
-		sizeof(DirectionalLight));
-	pixelShader->SetData(
-		"light2",
-		&dirLight2,
-		sizeof(DirectionalLight));
-
-	for (int i = 0; i < sceneManager.GetSceneEntities().size(); i++)
-	{
-		sceneManager.GetSceneEntities()[i].Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-	}
-
-	// Present the back buffer to the user
-	//  - Puts the final frame we're drawing into the window so the user can see it
-	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
-	swapChain->Present(0, 0);
+	renderSystem.Draw(deltaTime, totalTime);
 }
-
 
 #pragma region Mouse Input
 
@@ -285,7 +134,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	{
 		float xDiff = (x - prevMousePos.x) * 0.001f;
 		float yDiff = (y - prevMousePos.y) * 0.001f;
-		camera->Rotate(yDiff, xDiff);
+		renderSystem.RotateCamera(yDiff, xDiff);
 	}
 
 	// Save the previous mouse position, so we have it for the future

@@ -120,6 +120,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -134,6 +135,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Render.h" />
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Vertex.h" />
