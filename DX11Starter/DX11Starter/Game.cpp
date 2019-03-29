@@ -50,8 +50,8 @@ void Game::Init()
 	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain);
 	renderSystem.Init();
 	inputSystem = Input(&eventBus);
-	playerEntitySystem = PlayerEntity(&eventBus);
-	playerEntitySystem.init();
+	sceneManager = SceneManager(&eventBus);
+	sceneManager.Init();
 }
 
 // --------------------------------------------------------
@@ -76,8 +76,8 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	inputSystem.getInput();
-
+	inputSystem.GetInput();
+	sceneManager.Update(deltaTime, totalTime);
 	renderSystem.Update(deltaTime, totalTime);
 }
 

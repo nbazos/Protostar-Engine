@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 #include <queue>
 #include <vector>
@@ -8,6 +9,7 @@
 #include <map>
 #include <typeindex>
 
+#include "Events.h"
 // EventBus Messaging System Based on Implementation from: https://medium.com/@savas/nomad-game-engine-part-7-the-event-system-45a809ccb68f
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -29,30 +31,16 @@
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-class Event {
-protected:
-	virtual ~Event() {}
-};
-
-struct InputEvent : public Event 
-{
-	InputEvent(std::string str): STR {str} {}
-	std::string STR;
-	~InputEvent() {}
-};
-
 // This is the interface for MemberFunctionHandler that each specialization will use
 class HandlerFunctionBase {
 public:
 	// Call the member function
-	void exec(Event * evnt) {
-		call(evnt);
+	void Execute(Event * evnt) {
+		Call(evnt);
 	}
 private:
 	// Implemented by MemberFunctionHandler
-	virtual void call(Event * evnt) = 0;
+	virtual void Call(Event * evnt) = 0;
 };
 
 template<class T, class EventType>
@@ -62,7 +50,7 @@ public:
 
 	MemberFunctionHandler(T * instance, MemberFunction memberFunction) : instance{ instance }, memberFunction{ memberFunction } {};
 
-	void call(Event * evnt) {
+	void Call(Event * evnt) {
 		// Cast event to the correct type and call member function
 		(instance->*memberFunction)(static_cast<EventType*>(evnt));
 	}
@@ -96,7 +84,7 @@ public:
 	}
 
 	template<typename EventType>
-	void publish(EventType * evnt) {
+	void Publish(EventType * evnt) {
 		HandlerList * handlers = subscribers[typeid(EventType)];
 
 		if (handlers == nullptr) {
@@ -105,13 +93,13 @@ public:
 
 		for (auto & handler : *handlers) {
 			if (handler != nullptr) {
-				handler->exec(evnt);
+				handler->Execute(evnt);
 			}
 		}
 	}
 
 	template<class T, class EventType>
-	void subscribe(T * instance, void (T::*memberFunction)(EventType *)) {
+	void Subscribe(T * instance, void (T::*memberFunction)(EventType *)) {
 		HandlerList * handlers = subscribers[typeid(EventType)];
 
 		//First time initialization

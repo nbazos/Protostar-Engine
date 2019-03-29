@@ -2,7 +2,7 @@
 
 #include "EventBus.h"
 #include "Input.h"
-#include "PlayerEntity.h"
+#include "SceneManager.h"
 #include "Render.h"
 
 
@@ -31,7 +31,7 @@ private:
 	// Engine systems
 	EventBus eventBus;
 	Input inputSystem;
-	PlayerEntity playerEntitySystem;
+	SceneManager sceneManager;
 	Render renderSystem;
 };
 

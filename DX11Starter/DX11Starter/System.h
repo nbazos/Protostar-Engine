@@ -11,7 +11,7 @@ public:
 	}
 	~System() {}
 
-	virtual void init() {}
+	virtual void Init() {}
 protected:
 	EventBus * eventBus;
 };

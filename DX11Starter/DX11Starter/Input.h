@@ -9,6 +9,10 @@ public:
 	Input(EventBus * eventBusPtr) : System(eventBusPtr) {}
 	~Input();
 
-	void getInput();
+	void Init();
+	void GetInput();
+
+private:
+	bool cameraControlMode = false;
 };
 
