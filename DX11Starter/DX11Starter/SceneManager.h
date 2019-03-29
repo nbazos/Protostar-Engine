@@ -6,20 +6,20 @@
 
 class SceneManager : public System {
 public:
-	SceneManager();
-	SceneManager(EventBus * eventBusPtr) : System(eventBusPtr) {};
-	~SceneManager();
+	SceneManager() {};
+	SceneManager(EventBus * eventBusPtr, Camera * camera) : System(eventBusPtr), sceneCamera{ camera } {};
+	~SceneManager() {};
 
 	void Init();
 	void Update(float deltaT, float totalT);
 
 	void AddEntityToScene(GameEntity entity);
 	//void RemoveEntityFromScene(char * entityName);
-	std::vector<GameEntity> GetSceneEntities();
+	std::vector<GameEntity>* GetSceneEntities();
 
 private:
 	std::vector<GameEntity> sceneEntities;
-	Camera * sceneCamera;
+	Camera* sceneCamera;
 	float deltaTime;
 	float totalTime;
 

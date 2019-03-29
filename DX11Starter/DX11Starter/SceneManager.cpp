@@ -1,13 +1,5 @@
 #include "SceneManager.h"
 
-SceneManager::SceneManager()
-{
-}
-
-SceneManager::~SceneManager()
-{
-}
-
 void SceneManager::Init()
 {
 	// Subscribe to the events that the SceneManager system will respond to
@@ -19,6 +11,8 @@ void SceneManager::Update(float deltaT, float totalT)
 {
 	deltaTime = deltaT;
 	totalTime = totalT;
+	sceneCamera->Update(deltaT);
+
 }
 
 void SceneManager::AddEntityToScene(GameEntity entity)
@@ -26,9 +20,9 @@ void SceneManager::AddEntityToScene(GameEntity entity)
 	sceneEntities.push_back(entity);
 }
 
-std::vector<GameEntity> SceneManager::GetSceneEntities()
+std::vector<GameEntity> * SceneManager::GetSceneEntities()
 {
-	return sceneEntities;
+	return &sceneEntities;
 }
 
 void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
