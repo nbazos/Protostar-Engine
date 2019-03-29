@@ -47,7 +47,6 @@ int WINAPI WinMain(
 	// Create the Game object using
 	// the app handle we got from WinMain
 	Game dxGame(hInstance);
-
 	// Result variable for function calls below
 	HRESULT hr = S_OK;
 
