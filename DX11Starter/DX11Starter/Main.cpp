@@ -1,8 +1,8 @@
-
 #include <Windows.h>
 #include "Game.h"
-#include "soloud.h"
-#include "soloud_wav.h"
+#include "include/soloud.h"
+#include "include/soloud_speech.h"
+#include "include/soloud_thread.h"
 
 // --------------------------------------------------------
 // Entry point for a graphical (non-console) Windows application
@@ -12,16 +12,7 @@ int WINAPI WinMain(
 	HINSTANCE hPrevInstance,	// A handle to the previous instance of the app (always NULL)
 	LPSTR lpCmdLine,			// Command line params
 	int nCmdShow)				// How the window should be shown (we ignore this)
-{
-	SoLoud::Soloud gSoloud; //SoLoud engine
-	SoLoud::Wav gWave;		//One wave file
-
-	gSoloud.init();			//Initialize SoLoud
-	gWave.load("audio/Backgrnd.wav"); // Load a wave
-	gWave.setLooping(1);              // Tell SoLoud to loop the sound
-
-	int x = gSoloud.play(gWave); //Play the wave
-
+{	
 #if defined(DEBUG) | defined(_DEBUG)
 	// Enable memory leak detection as a quick and dirty
 	// way of determining if we forgot to clean something up
@@ -55,6 +46,30 @@ int WINAPI WinMain(
 		}
 	}
 
+	///Test for playing audio
+	/*	
+	// Define a couple of variables
+	SoLoud::Soloud soloud;  // SoLoud engine core
+	SoLoud::Speech speech;  // A sound source (speech)
+	
+	// Configure sound source
+	speech.setText("Hi Israel, Hi Niko, Hi JaJuan");
+	
+	// initialize SoLoud.
+	soloud.init();
+	
+	// Play the sound source
+	// This could be done several times
+	soloud.play(speech);
+	
+	// Wait until sounds have finished
+	while (soloud.getActiveVoiceCount() > 0)
+	{
+		// Still going, sleep for a bit
+		SoLoud::Thread::sleep(100);
+	}
+	*/
+
 	// Create the Game object using
 	// the app handle we got from WinMain
 	Game dxGame(hInstance);
@@ -70,8 +85,9 @@ int WINAPI WinMain(
 	// early if something failed
 	hr = dxGame.InitDirectX();
 	if(FAILED(hr)) return hr;
-		
-	//gSoloud.deinit();	 //Clean up audio before shutting down
+
+	//Clean up audio before shutting down
+	//gSoloud.deinit();	 
 
 	// Begin the message and game loop, and then return
 	// whatever we get back once the game loop is over

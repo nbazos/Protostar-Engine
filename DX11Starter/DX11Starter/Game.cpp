@@ -29,11 +29,19 @@ Game::Game(HINSTANCE hInstance)
 	brickSRV = 0;
 	grassSRV = 0;
 	sampler = 0;
+	
+	///Initalize audio and play it
+	//gSoloud.init();			//Initialize SoLoud
+	//gWave.load("audio/Backgrnd.wav"); // Load a wave
+	//gWave.setLooping(1);              // Tell SoLoud to loop the sound
+	//gSoloud.play(gWave); //Play the wave file
+	//gSoloud.playBackground(gWave);	// Play sound without panning
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
-	CreateConsoleWindow(500, 120, 32, 120);
+	CreateConsoleWindow(500, 120, 32, 120);	
 	printf("Console window created successfully.  Feel free to printf() here.\n");
+	
 #endif
 	
 }
