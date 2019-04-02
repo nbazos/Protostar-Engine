@@ -1,6 +1,8 @@
 
 #include <Windows.h>
 #include "Game.h"
+#include "soloud.h"
+#include "soloud_wav.h"
 
 // --------------------------------------------------------
 // Entry point for a graphical (non-console) Windows application
@@ -11,6 +13,15 @@ int WINAPI WinMain(
 	LPSTR lpCmdLine,			// Command line params
 	int nCmdShow)				// How the window should be shown (we ignore this)
 {
+	SoLoud::Soloud gSoloud; //SoLoud engine
+	SoLoud::Wav gWave;		//One wave file
+
+	gSoloud.init();			//Initialize SoLoud
+	gWave.load("audio/Backgrnd.wav"); // Load a wave
+	gWave.setLooping(1);              // Tell SoLoud to loop the sound
+
+	int x = gSoloud.play(gWave); //Play the wave
+
 #if defined(DEBUG) | defined(_DEBUG)
 	// Enable memory leak detection as a quick and dirty
 	// way of determining if we forgot to clean something up
@@ -59,6 +70,8 @@ int WINAPI WinMain(
 	// early if something failed
 	hr = dxGame.InitDirectX();
 	if(FAILED(hr)) return hr;
+		
+	//gSoloud.deinit();	 //Clean up audio before shutting down
 
 	// Begin the message and game loop, and then return
 	// whatever we get back once the game loop is over
