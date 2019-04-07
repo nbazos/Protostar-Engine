@@ -19,3 +19,4 @@ struct InputEvent : public Event
 
 struct InputMoveLeft : public Event {};
 struct InputMoveRight : public Event {};
+struct PlayAudioFile : public Event {};

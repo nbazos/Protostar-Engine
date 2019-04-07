@@ -32,4 +32,10 @@ void Input::GetInput()
 		eventBus->Publish(ie);
 		delete ie;
 	}
+	if (GetKeyState('P') & 0x800) 
+	{
+		PlayAudioFile * ie = DBG_NEW PlayAudioFile();
+		eventBus->Publish(ie);
+		delete ie;
+	}
 }

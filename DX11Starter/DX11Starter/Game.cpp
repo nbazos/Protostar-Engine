@@ -30,12 +30,7 @@ Game::Game(HINSTANCE hInstance)
 	grassSRV = 0;
 	sampler = 0;
 	
-	///Initalize audio and play it
-	//gSoloud.init();			//Initialize SoLoud
-	//gWave.load("audio/Backgrnd.wav"); // Load a wave
-	//gWave.setLooping(1);              // Tell SoLoud to loop the sound
-	//gSoloud.play(gWave); //Play the wave file
-	//gSoloud.playBackground(gWave);	// Play sound without panning
+
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -109,6 +104,10 @@ void Game::Init()
 	CreateBasicGeometry();
 	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
 	renderSystem.Init();
+	soundEngine = Sound(&eventBus);
+	soundEngine.Init();
+	soundEngine.LoadFile("../../DX11Starter/audio/psycho.wav");	// "../../DX11Starter/audio ---" will get you to audio
+	soundEngine.Play();
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  

@@ -12,12 +12,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{f9e8d06b-dd7b-438c-8366-5dabd553fb21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\include">
-      <UniqueIdentifier>{76f7fbfa-722a-4305-84b4-4bcd9700283b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\soloud">
-      <UniqueIdentifier>{256387a1-2f0f-4c4a-bba3-404b500e2a0e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXCore.cpp">
@@ -53,74 +47,8 @@
     <ClCompile Include="Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="soloud\dr_impl.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_audiosource.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_bus.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_3d.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_basicops.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_faderops.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_filterops.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_getters.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_setters.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_voicegroup.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_core_voiceops.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_fader.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_fft.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_fft_lut.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_file.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_filter.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_queue.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_thread.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_wav.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_wavstream.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\soloud_winmm.cpp">
-      <Filter>Source Files\soloud</Filter>
-    </ClCompile>
-    <ClCompile Include="soloud\stb_vorbis.c">
-      <Filter>Source Files\soloud</Filter>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -169,125 +97,8 @@
     <ClInclude Include="Render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\stb_vorbis.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_audiosource.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_bassboostfilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_biquadresonantfilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_bus.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_c.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_dcremovalfilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_echofilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_error.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_fader.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_fft.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_fftfilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_file.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_file_hack_off.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_file_hack_on.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_filter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_flangerfilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_internal.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_lofifilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_monotone.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_openmpt.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_queue.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_robotizefilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_sfxr.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_speech.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_tedsid.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_thread.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_vic.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_vizsn.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_wav.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_waveshaperfilter.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\soloud_wavstream.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\dr_flac.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\dr_mp3.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\dr_wav.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\darray.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\klatt.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\resonator.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\tts.h">
-      <Filter>Header Files\include</Filter>
+    <ClInclude Include="Sound.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

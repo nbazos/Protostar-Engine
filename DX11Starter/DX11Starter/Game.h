@@ -4,8 +4,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "Render.h"
-#include "include/soloud.h"
-#include "include/soloud_wav.h"
+#include "Sound.h"
 
 #include <WICTextureLoader.h>
 
@@ -32,9 +31,6 @@ public:
 	void OnMouseMove (WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta,   int x, int y);
 
-	/// Test for implementing audio throughout the game
-	//SoLoud::Soloud gSoloud; //SoLoud engine
-	//SoLoud::Wav gWave;		//One wave file
 private:
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
@@ -61,4 +57,5 @@ private:
 	Input inputSystem;
 	SceneManager sceneManager;
 	Render renderSystem;
+	Sound soundEngine;
 };

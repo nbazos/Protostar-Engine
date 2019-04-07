@@ -1,8 +1,5 @@
 #include <Windows.h>
 #include "Game.h"
-#include "include/soloud.h"
-#include "include/soloud_speech.h"
-#include "include/soloud_thread.h"
 
 // --------------------------------------------------------
 // Entry point for a graphical (non-console) Windows application
@@ -12,12 +9,12 @@ int WINAPI WinMain(
 	HINSTANCE hPrevInstance,	// A handle to the previous instance of the app (always NULL)
 	LPSTR lpCmdLine,			// Command line params
 	int nCmdShow)				// How the window should be shown (we ignore this)
-{	
+{
 #if defined(DEBUG) | defined(_DEBUG)
 	// Enable memory leak detection as a quick and dirty
 	// way of determining if we forgot to clean something up
 	//  - You may want to use something more advanced, like Visual Leak Detector
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 	// Ensure "Current Directory" (relative path) is always the .exe's folder
@@ -46,30 +43,6 @@ int WINAPI WinMain(
 		}
 	}
 
-	///Test for playing audio
-	/*	
-	// Define a couple of variables
-	SoLoud::Soloud soloud;  // SoLoud engine core
-	SoLoud::Speech speech;  // A sound source (speech)
-	
-	// Configure sound source
-	speech.setText("Hi Israel, Hi Niko, Hi JaJuan");
-	
-	// initialize SoLoud.
-	soloud.init();
-	
-	// Play the sound source
-	// This could be done several times
-	soloud.play(speech);
-	
-	// Wait until sounds have finished
-	while (soloud.getActiveVoiceCount() > 0)
-	{
-		// Still going, sleep for a bit
-		SoLoud::Thread::sleep(100);
-	}
-	*/
-
 	// Create the Game object using
 	// the app handle we got from WinMain
 	Game dxGame(hInstance);
@@ -79,15 +52,12 @@ int WINAPI WinMain(
 	// Attempt to create the window for our program, and
 	// exit early if something failed
 	hr = dxGame.InitWindow();
-	if(FAILED(hr)) return hr;
+	if (FAILED(hr)) return hr;
 
 	// Attempt to initialize DirectX, and exit
 	// early if something failed
 	hr = dxGame.InitDirectX();
-	if(FAILED(hr)) return hr;
-
-	//Clean up audio before shutting down
-	//gSoloud.deinit();	 
+	if (FAILED(hr)) return hr;
 
 	// Begin the message and game loop, and then return
 	// whatever we get back once the game loop is over
