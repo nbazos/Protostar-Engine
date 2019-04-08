@@ -105,9 +105,9 @@ void Game::Init()
 	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
-	soundEngine.Init();
-	soundEngine.LoadFile("../../DX11Starter/audio/psycho.wav");	// "../../DX11Starter/audio ---" will get you to audio
-	soundEngine.Play();
+	soundEngine.Init3D();
+	soundEngine.LoadFile3D("../../DX11Starter/audio/psycho.wav");	// "../../DX11Starter/audio ---" will get you to audio
+	soundEngine.Play3D();
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
