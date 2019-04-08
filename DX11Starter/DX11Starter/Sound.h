@@ -19,6 +19,9 @@ public:
 
 	void Init();
 	void Init3D();
+	void UpdateListener();
+	void UpdateSound();
+	void UpdateSystem();
 
 	void SetVolume(float volume);
 	void LoadFile(const char* file);
@@ -40,8 +43,9 @@ private:
 	static FMOD_SOUND* m_backgroud;
 	static FMOD_CHANNEL* m_channel;
 	static FMOD_RESULT m_result;
-	const FMOD_VECTOR* m_position;
-	const FMOD_VECTOR* m_altPanPos;
+	FMOD_VECTOR listenerVelocity, listenerUp, listenerForward, listenerPos;
+	FMOD_VECTOR* m_position;
+	FMOD_VECTOR* m_altPanPos;
 
 	static bool m_isPlaying;
 	static bool m_isReady;

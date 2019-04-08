@@ -1,5 +1,9 @@
 #include "Sound.h"
 
+#define DOPPLER_SCALE         1.0
+#define DISTANCE_FACTOR       1.0
+#define ROLLOFF_SCALE         0.5
+
 // Attritbutes
 bool Sound::m_isPlaying = true;
 bool Sound::m_isReady = true;
@@ -9,6 +13,7 @@ FMOD_RESULT Sound::m_result;
 FMOD_SYSTEM* Sound::m_soundSystem;
 FMOD_SOUND* Sound::m_backgroud;
 FMOD_CHANNEL* Sound::m_channel;
+FMOD_VECTOR listenerVelocity, listenerUp, listenerForward, listenerPos;
 FMOD_VECTOR* m_position;
 FMOD_VECTOR* m_altPanPos;
 
@@ -59,6 +64,7 @@ void Sound::Init()
 	}
 }
 
+// Initalize sound system in a 3D space
 void Sound::Init3D()
 {
 	// Subscribes to the event(s) that the Sound system will respond to
@@ -76,6 +82,7 @@ void Sound::Init3D()
 	if (m_isReady == true)
 	{
 		m_result = FMOD_System_Init(m_soundSystem, 10, FMOD_INIT_3D_RIGHTHANDED, 0);
+		FMOD_System_Set3DSettings(m_soundSystem, DOPPLER_SCALE, DISTANCE_FACTOR, ROLLOFF_SCALE);
 		cout << "FMOD CHECK 1 - Initalizing 3D" << endl;
 	}
 
@@ -93,6 +100,23 @@ void Sound::Init3D()
 		FMOD_Channel_SetVolume(m_channel, 1.0f);
 		cout << "FMOD CHECK 2 - Setting Volume 3D" << endl;
 	}
+}
+
+void Sound::UpdateListener()
+{
+	// Used to update the listener's position
+}
+
+void Sound::UpdateSound()
+{
+	// Used to update sound position based off game
+}
+
+// Update the system according to where the listener is listening from
+void Sound::UpdateSystem()
+{
+	FMOD_System_Set3DListenerAttributes(m_soundSystem, 0, &listenerPos, &listenerVelocity, &listenerForward, &listenerUp);
+	FMOD_System_Update(m_soundSystem);
 }
 
 // Sets the volume between 0.0f and 1.0f
