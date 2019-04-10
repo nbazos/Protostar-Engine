@@ -1,6 +1,7 @@
 #pragma once
 
-class Event {
+class Event 
+{
 protected:
 	virtual ~Event() {}
 };
@@ -19,4 +20,7 @@ struct InputEvent : public Event
 
 struct InputMoveLeft : public Event {};
 struct InputMoveRight : public Event {};
-struct PlayAudioFile : public Event {};
+struct PauseAudio : public Event {};
+struct PlayBackground : public Event {};
+struct PlayBulletFire : public Event {};
+struct SceneChange : public Event {};

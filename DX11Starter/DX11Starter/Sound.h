@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class Sound : public System 
+class Sound : public System
 {
 public:
 	Sound() {};
@@ -29,6 +29,8 @@ public:
 	void UnloadFile();
 	void Play();
 	void Play3D();
+	void ChangeBackground(SceneChange * soundEvent, const char* file);
+	void Bullet(PlayBulletFire * soundEvent);
 
 	bool GetSound();
 
@@ -36,7 +38,7 @@ public:
 	void SetSound(bool sound);
 
 	void ToggleBackground();
-	void TogglePause(PlayAudioFile * inputEvent);
+	void TogglePause(PauseAudio * soundEvent);
 
 private:
 	static FMOD_SYSTEM* m_soundSystem;

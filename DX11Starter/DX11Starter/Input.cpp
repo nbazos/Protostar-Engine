@@ -34,8 +34,15 @@ void Input::GetInput()
 	}
 	if (GetKeyState('P') & 0x800) 
 	{
-		PlayAudioFile * ie = DBG_NEW PlayAudioFile();
+		PauseAudio * ie = DBG_NEW PauseAudio();
 		eventBus->Publish(ie);
 		delete ie;
 	}
+	// Would get mouse left click and play bullet fire
+	/*if (GetKeyState(MOUSEEVENTF_LEFTDOWN) & 0x800)
+	{
+		PlayBulletFire * ie = DBG_NEW PlayBulletFire();
+		eventBus->Publish(ie);
+		delete ie;
+	}*/
 }

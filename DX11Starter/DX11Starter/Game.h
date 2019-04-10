@@ -8,7 +8,8 @@
 
 #include <WICTextureLoader.h>
 
-class Game : public DXCore {
+class Game : public DXCore
+{
 public:
 	Game(HINSTANCE hInstance);
 	~Game();
@@ -26,10 +27,10 @@ public:
 	void LoadShaders();
 
 	// Overridden mouse input helper methods
-	void OnMouseDown (WPARAM buttonState, int x, int y);
-	void OnMouseUp	 (WPARAM buttonState, int x, int y);
-	void OnMouseMove (WPARAM buttonState, int x, int y);
-	void OnMouseWheel(float wheelDelta,   int x, int y);
+	void OnMouseDown(WPARAM buttonState, int x, int y);
+	void OnMouseUp(WPARAM buttonState, int x, int y);
+	void OnMouseMove(WPARAM buttonState, int x, int y);
+	void OnMouseWheel(float wheelDelta, int x, int y);
 
 private:
 	// Keeps track of the old mouse position.  Useful for 

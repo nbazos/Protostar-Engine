@@ -96,7 +96,7 @@ void Game::Init()
 	dirLight1 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f) };
 	dirLight2 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
 
-	// Engine Subsystem & CommunicationI nitialization
+	// Engine Subsystem & Communication Initialization
 	eventBus = EventBus();
 	inputSystem = Input(&eventBus);
 	sceneManager = SceneManager(&eventBus, camera);
@@ -106,8 +106,6 @@ void Game::Init()
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
 	soundEngine.Init3D();
-	soundEngine.LoadFile3D("../../DX11Starter/audio/psycho.wav");	// "../../DX11Starter/audio ---" will get you to audio
-	soundEngine.Play3D();
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -229,8 +227,6 @@ void Game::Draw(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void Game::OnMouseDown(WPARAM buttonState, int x, int y)
 {
-	// Add any custom code here...
-
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;

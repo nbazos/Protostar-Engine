@@ -100,6 +100,8 @@ void Sound::Init3D()
 		FMOD_Channel_SetVolume(m_channel, 1.0f);
 		cout << "FMOD CHECK 2 - Setting Volume 3D" << endl;
 	}
+
+	Play3D();
 }
 
 void Sound::UpdateListener()
@@ -180,21 +182,36 @@ void Sound::UnloadFile()
 void Sound::Play()
 {
 	if (m_isReady && m_isPlaying == true)
-	{		
+	{
 		m_result = FMOD_System_PlaySound(m_soundSystem, m_backgroud, FMOD_DEFAULT, false, &m_channel);
 		FMOD_Channel_SetMode(m_channel, FMOD_LOOP_NORMAL);
-		cout << "FMOD CHECK 4 - Playing Audio" << endl;
+		cout << "FMOD CHECK 4 - Playing Background" << endl;
 	}
 }
 
 void Sound::Play3D()
 {
+	LoadFile3D("../../DX11Starter/audio/psycho.wav");
+
 	if (m_isReady && m_isPlaying == true)
 	{
 		m_result = FMOD_Channel_Set3DAttributes(m_channel, m_position, 0, m_altPanPos);
 		m_result = FMOD_System_PlaySound(m_soundSystem, m_backgroud, FMOD_DEFAULT, false, &m_channel);
 		FMOD_Channel_SetMode(m_channel, FMOD_LOOP_NORMAL);
-		cout << "FMOD CHECK 4 - Playing Audio 3D" << endl;
+		cout << "FMOD CHECK 4 - Playing Background 3D" << endl;
+	}
+}
+
+void Sound::Bullet(PlayBulletFire * soundEvent)
+{
+	LoadFile3D("../../DX11Starter/audio/soundEffects/bulletFire.wav");
+
+	if (m_isReady && m_isPlaying == true)
+	{
+		m_result = FMOD_Channel_Set3DAttributes(m_channel, m_position, 0, m_altPanPos);
+		m_result = FMOD_System_PlaySound(m_soundSystem, m_backgroud, FMOD_DEFAULT, false, &m_channel);
+		FMOD_Channel_SetMode(m_channel, FMOD_LOOP_NORMAL);
+		cout << "Firing Bullet" << endl;
 	}
 }
 
@@ -224,7 +241,7 @@ void Sound::ToggleBackground()
 	if (m_isPlaying == true)
 	{
 		LoadFile(m_currentSound);
-		Play();
+		//Play3D();
 	}
 
 	if (m_isPlaying == false)
@@ -234,7 +251,7 @@ void Sound::ToggleBackground()
 }
 
 // Pauses or unpauses the current channel
-void Sound::TogglePause(PlayAudioFile * inputEvent)
+void Sound::TogglePause(PauseAudio * soundEvent)
 {
 	FMOD_BOOL h;
 	FMOD_Channel_GetPaused(m_channel, &h);
