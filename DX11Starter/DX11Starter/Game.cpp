@@ -105,7 +105,8 @@ void Game::Init()
 	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
-	soundEngine.Init3D();
+	soundEngine.Init();
+	soundEngine.InitSE();
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -227,6 +228,13 @@ void Game::Draw(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void Game::OnMouseDown(WPARAM buttonState, int x, int y)
 {
+	// TODO: Find proper input check so it only accepts left mouse clicks
+	if (buttonState && 0x00001)
+	{
+		PlayBulletFire * ie = DBG_NEW PlayBulletFire();
+		eventBus.Publish(ie);
+		delete ie;
+	}
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;

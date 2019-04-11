@@ -10,6 +10,9 @@
 
 using namespace std;
 
+// --------------------------------------------------------
+// Necessary methods for proper sound engine
+// --------------------------------------------------------
 class Sound : public System
 {
 public:
@@ -18,19 +21,18 @@ public:
 	~Sound();
 
 	void Init();
-	void Init3D();
+	void InitSE();
 	void UpdateListener();
 	void UpdateSound();
 	void UpdateSystem();
 
 	void SetVolume(float volume);
 	void LoadFile(const char* file);
-	void LoadFile3D(const char* file);
+	void LoadFileSE(const char* file);
 	void UnloadFile();
 	void Play();
-	void Play3D();
-	void ChangeBackground(SceneChange * soundEvent, const char* file);
-	void Bullet(PlayBulletFire * soundEvent);
+	void PlaySE(PlayBulletFire * soundEvent);
+	void ChangeBackground(SceneChange * soundEvent, const char* file); //TODO
 
 	bool GetSound();
 
@@ -42,8 +44,11 @@ public:
 
 private:
 	static FMOD_SYSTEM* m_soundSystem;
+	static FMOD_SYSTEM* m_soundSystemEffect;
 	static FMOD_SOUND* m_backgroud;
+	static FMOD_SOUND* m_effect;
 	static FMOD_CHANNEL* m_channel;
+	static FMOD_CHANNEL* m_channelEffect;
 	static FMOD_RESULT m_result;
 	FMOD_VECTOR listenerVelocity, listenerUp, listenerForward, listenerPos;
 	FMOD_VECTOR* m_position;

@@ -38,11 +38,4 @@ void Input::GetInput()
 		eventBus->Publish(ie);
 		delete ie;
 	}
-	// Would get mouse left click and play bullet fire
-	/*if (GetKeyState(MOUSEEVENTF_LEFTDOWN) & 0x800)
-	{
-		PlayBulletFire * ie = DBG_NEW PlayBulletFire();
-		eventBus->Publish(ie);
-		delete ie;
-	}*/
 }
