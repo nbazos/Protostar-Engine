@@ -25,7 +25,9 @@ Sound::~Sound()
 
 }
 
+// --------------------------------------------------------
 // Initializes the audio engine
+// --------------------------------------------------------
 void Sound::Init()
 {
 	// Subscribes to the event(s) that the Sound system will respond to
@@ -68,7 +70,9 @@ void Sound::Init()
 	Play();
 }
 
+// --------------------------------------------------------
 // Sets up the system for the sound effects
+// --------------------------------------------------------
 void Sound::InitSE()
 {
 	// Subscribes to the event(s) that the Sound system will respond to
@@ -106,6 +110,7 @@ void Sound::InitSE()
 	}
 }
 
+//TODO: 3D Positioning
 void Sound::UpdateListener()
 {
 	// Used to update the listener's position for more 3D aspects
@@ -116,14 +121,18 @@ void Sound::UpdateSound()
 	// Used to update sound position based off game
 }
 
-// Update the system according to where the listener is listening from
+// --------------------------------------------------------
+// Update the system according to the listener
+// --------------------------------------------------------
 void Sound::UpdateSystem()
 {
 	FMOD_System_Set3DListenerAttributes(m_soundSystem, 0, &listenerPos, &listenerVelocity, &listenerForward, &listenerUp);
 	FMOD_System_Update(m_soundSystem);
 }
 
+// --------------------------------------------------------
 // Sets the volume between 0.0f and 1.0f
+// --------------------------------------------------------
 void Sound::SetVolume(float volume)
 {
 	if (m_isReady && m_isPlaying && volume >= 0.0f && volume <= 1.0f)
@@ -132,7 +141,9 @@ void Sound::SetVolume(float volume)
 	}
 }
 
+// --------------------------------------------------------
 // Loads the selected file from the appropriate directory
+// --------------------------------------------------------
 void Sound::LoadFile(const char * file)
 {
 	m_currentSound = (char*)file;
@@ -150,9 +161,16 @@ void Sound::LoadFile(const char * file)
 			m_isReady = false;
 		}
 	}
+
+	// Sets a channels priority. Higher priority means it is less likely to get discarded when
+	// FSOUND_FREE is used to select a channel, when all channels are being used, and one has to
+	// be rejected.If a channel has an equal priority then it will be replaced.
+	// FMOD_Channel_SetPriority(m_channel, 255);
 }
 
-// Loads the selected effect file from the appropriate directory
+// --------------------------------------------------------
+// Loads the selected effect file from directory
+// --------------------------------------------------------
 void Sound::LoadFileSE(const char * file)
 {
 	m_currentSound = (char*)file;
@@ -172,7 +190,9 @@ void Sound::LoadFileSE(const char * file)
 	}
 }
 
+// --------------------------------------------------------
 // Unloads the recent loaded file
+// --------------------------------------------------------
 void Sound::UnloadFile()
 {
 	if (m_isReady == true)
@@ -181,7 +201,9 @@ void Sound::UnloadFile()
 	}
 }
 
+// --------------------------------------------------------
 // Plays the loaded audio file
+// --------------------------------------------------------
 void Sound::Play()
 {
 	if (m_isReady && m_isPlaying == true)
@@ -193,7 +215,9 @@ void Sound::Play()
 	}
 }
 
-// Plays the loaded sound effect when the event bus calls the event
+// --------------------------------------------------------
+// Plays the loaded sound effect event
+// --------------------------------------------------------
 void Sound::PlaySE(PlayBulletFire * soundEvent)
 {
 	LoadFileSE("../../DX11Starter/audio/soundEffects/bulletFire.wav");
@@ -206,31 +230,42 @@ void Sound::PlaySE(PlayBulletFire * soundEvent)
 	}
 }
 
+// --------------------------------------------------------
+// Changes background audio based on the scene
+// --------------------------------------------------------
 void Sound::ChangeBackground(SceneChange * soundEvent)
 {
 	LoadFile("../../DX11Starter/audio/backgrnd.wav");
 	Play();
 }
 
+// --------------------------------------------------------
 // Returns the current played audio
+// --------------------------------------------------------
 bool Sound::GetSound()
 {
 	return m_isPlaying;
 }
 
+// --------------------------------------------------------
 // Sets audio pause to true or false
+// --------------------------------------------------------
 void Sound::SetPause(bool pause)
 {
 	FMOD_Channel_SetPaused(m_channel, pause);
 }
 
+// --------------------------------------------------------
 // Sets sound to true or false
+// --------------------------------------------------------
 void Sound::SetSound(bool sound)
 {
 	m_isPlaying = sound;
 }
 
+// --------------------------------------------------------
 // Loads the current sound and play it or unload the file
+// --------------------------------------------------------
 void Sound::ToggleBackground()
 {
 	m_isPlaying = !m_isPlaying;
@@ -246,7 +281,9 @@ void Sound::ToggleBackground()
 	}
 }
 
+// --------------------------------------------------------
 // Pauses or unpauses the current channel
+// --------------------------------------------------------
 void Sound::TogglePause(PauseAudio * soundEvent)
 {
 	FMOD_BOOL p;

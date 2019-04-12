@@ -5,6 +5,7 @@
 #include "inc\fmod.h"
 #include "inc\fmod_errors.h"
 #include "inc\fmod_dsp.h"
+#include "SimpleMath.h"
 #include <iostream>
 #include <string>
 
@@ -32,7 +33,7 @@ public:
 	void UnloadFile();
 	void Play();
 	void PlaySE(PlayBulletFire * soundEvent);
-	void ChangeBackground(SceneChange * soundEvent); //TODO
+	void ChangeBackground(SceneChange * soundEvent);
 
 	bool GetSound();
 
@@ -57,4 +58,5 @@ private:
 	static bool m_isPlaying;
 	static bool m_isReady;
 	static char * m_currentSound;
+	float cameraPosition;
 };
