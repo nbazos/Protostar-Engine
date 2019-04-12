@@ -32,7 +32,7 @@ public:
 	void UnloadFile();
 	void Play();
 	void PlaySE(PlayBulletFire * soundEvent);
-	void ChangeBackground(SceneChange * soundEvent, const char* file); //TODO
+	void ChangeBackground(SceneChange * soundEvent); //TODO
 
 	bool GetSound();
 

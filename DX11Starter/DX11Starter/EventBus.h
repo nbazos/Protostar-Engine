@@ -66,7 +66,7 @@ typedef std::list<HandlerFunctionBase*> HandlerList;
 class EventBus {
 public:
 	EventBus() {}
-	~EventBus() 
+	~EventBus()
 	{
 		for (std::map<std::type_index, HandlerList*>::iterator itr = subscribers.begin(); itr != subscribers.end(); itr++)
 		{

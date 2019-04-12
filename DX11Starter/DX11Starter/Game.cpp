@@ -235,6 +235,7 @@ void Game::OnMouseDown(WPARAM buttonState, int x, int y)
 		eventBus.Publish(ie);
 		delete ie;
 	}
+
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;

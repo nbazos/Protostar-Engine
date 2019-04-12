@@ -30,6 +30,7 @@ void Sound::Init()
 {
 	// Subscribes to the event(s) that the Sound system will respond to
 	eventBus->Subscribe(this, &Sound::TogglePause);	// can pause background for now
+	eventBus->Subscribe(this, &Sound::ChangeBackground);
 
 	m_result = FMOD_System_Create(&m_soundSystem);
 
@@ -63,6 +64,7 @@ void Sound::Init()
 	}
 
 	// Plays the background initally, which will upload before starting
+	LoadFile("../../DX11Starter/audio/psycho.wav");
 	Play();
 }
 
@@ -182,8 +184,6 @@ void Sound::UnloadFile()
 // Plays the loaded audio file
 void Sound::Play()
 {
-	LoadFile("../../DX11Starter/audio/psycho.wav");
-
 	if (m_isReady && m_isPlaying == true)
 	{
 		m_result = FMOD_Channel_Set3DAttributes(m_channel, m_position, 0, m_altPanPos);
@@ -204,6 +204,12 @@ void Sound::PlaySE(PlayBulletFire * soundEvent)
 		m_result = FMOD_System_PlaySound(m_soundSystemEffect, m_effect, FMOD_DEFAULT, false, &m_channelEffect);
 		//cout << "Firing Bullet" << endl;
 	}
+}
+
+void Sound::ChangeBackground(SceneChange * soundEvent)
+{
+	LoadFile("../../DX11Starter/audio/backgrnd.wav");
+	Play();
 }
 
 // Returns the current played audio
