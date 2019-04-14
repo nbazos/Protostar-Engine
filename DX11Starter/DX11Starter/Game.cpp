@@ -95,7 +95,8 @@ void Game::Init()
 
 	// Engine Subsystem & CommunicationI nitialization
 	eventBus = EventBus();
-	inputSystem = Input(&eventBus);
+	inputSystem = &Input(&eventBus, width, height);
+	inputSystem->Init();
 	sceneManager = SceneManager(&eventBus, camera);
 	sceneManager.Init();
 	CreateBasicGeometry();
@@ -192,7 +193,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	inputSystem.GetInput();
+	inputSystem->GetInput();
 	sceneManager.Update(deltaTime, totalTime);
 }
 

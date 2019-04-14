@@ -49,10 +49,10 @@ private:
 
 	DirectionalLight dirLight1;
 	DirectionalLight dirLight2;
-
+	
 	// Engine systems
 	EventBus eventBus;
-	Input inputSystem;
+	Input* inputSystem;
 	SceneManager sceneManager;
 	Render renderSystem;
 };

@@ -1,19 +1,17 @@
 #include "Input.h"
 
-Input::Input()
-{
-}
-
-Input::~Input()
-{
-}
-
 void Input::Init()
 {
+	manager.SetDisplaySize(screenWidth, screenHeight);
+
+	keyboardId = manager.CreateDevice<gainput::InputDeviceKeyboard>();
+	mouseId = manager.CreateDevice<gainput::InputDeviceMouse>();
 }
 
 void Input::GetInput()
 {
+	gainput::InputMap map(manager);
+
 	if (GetKeyState(VK_F3))
 	{
 		cameraControlMode = !cameraControlMode;
