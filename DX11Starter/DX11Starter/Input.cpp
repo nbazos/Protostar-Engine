@@ -38,10 +38,4 @@ void Input::GetInput()
 		eventBus->Publish(ie);
 		delete ie;
 	}
-	if (GetKeyState('C') & 0x800) 
-	{
-		SceneChange * ie = DBG_NEW SceneChange();
-		eventBus->Publish(ie);
-		delete ie;
-	}
 }

@@ -1,11 +1,14 @@
 #pragma once
 
+#define DOPPLER_SCALE         1.0
+#define DISTANCE_FACTOR       1.0
+#define ROLLOFF_SCALE         0.5
+
 #include "System.h"
 #include "inc\fmod.hpp"
 #include "inc\fmod.h"
 #include "inc\fmod_errors.h"
 #include "inc\fmod_dsp.h"
-#include "SimpleMath.h"
 #include <iostream>
 #include <string>
 
@@ -22,22 +25,21 @@ public:
 	~Sound();
 
 	void Init();
-	void InitSE();
 	void UpdateListener();
 	void UpdateSound();
-	void UpdateSystem();
+	void UpdateSystem(FMOD_SYSTEM* audioSystem);
 
-	void SetVolume(float volume);
-	void LoadFile(const char* file);
-	void LoadFileSE(const char* file);
-	void UnloadFile();
-	void Play();
-	void PlaySE(PlayBulletFire * soundEvent);
+	void SetVolume(FMOD_CHANNEL* channel, float volume);
+	void LoadFile(FMOD_SYSTEM* audioSystem, FMOD_SOUND* sound, const char* file);
+	void UnloadFile(FMOD_SOUND* sound);
+	void Play(FMOD_SYSTEM* audioSystem, FMOD_CHANNEL* channel, FMOD_SOUND* sound, FMOD_VECTOR* position, FMOD_VECTOR* altPanPos);
+	void SwordSlash(SwordSlashes * soundEvent);
 	void ChangeBackground(SceneChange * soundEvent);
 
+	void GetPause(FMOD_BOOL p);
 	bool GetSound();
 
-	void SetPause(bool pause);
+	void SetPause(FMOD_BOOL p);
 	void SetSound(bool sound);
 
 	void ToggleBackground();

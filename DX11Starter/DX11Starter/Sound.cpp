@@ -1,9 +1,5 @@
 #include "Sound.h"
 
-#define DOPPLER_SCALE         1.0
-#define DISTANCE_FACTOR       1.0
-#define ROLLOFF_SCALE         0.5
-
 // Attritbutes
 bool Sound::m_isPlaying = true;
 bool Sound::m_isReady = true;
@@ -26,15 +22,17 @@ Sound::~Sound()
 }
 
 // --------------------------------------------------------
-// Initializes the audio engine
+// Initializes the audio engine system(s)
 // --------------------------------------------------------
 void Sound::Init()
 {
 	// Subscribes to the event(s) that the Sound system will respond to
-	eventBus->Subscribe(this, &Sound::TogglePause);	// can pause background for now
+	eventBus->Subscribe(this, &Sound::TogglePause);
 	eventBus->Subscribe(this, &Sound::ChangeBackground);
+	eventBus->Subscribe(this, &Sound::SwordSlash);
 
 	m_result = FMOD_System_Create(&m_soundSystem);
+	m_result = FMOD_System_Create(&m_soundSystemEffect);
 
 	// Checks if there were no errors with creating the sound system
 	if (m_result != FMOD_OK)
@@ -45,8 +43,14 @@ void Sound::Init()
 
 	if (m_isReady == true)
 	{
+		// Standard Sound System
 		m_result = FMOD_System_Init(m_soundSystem, 10, FMOD_INIT_3D_RIGHTHANDED, 0);
 		FMOD_System_Set3DSettings(m_soundSystem, DOPPLER_SCALE, DISTANCE_FACTOR, ROLLOFF_SCALE);
+
+		// Sound Effect System
+		m_result = FMOD_System_Init(m_soundSystemEffect, 10, FMOD_INIT_3D_RIGHTHANDED, 0);
+		FMOD_System_Set3DSettings(m_soundSystemEffect, DOPPLER_SCALE, DISTANCE_FACTOR, ROLLOFF_SCALE);
+
 		//cout << "FMOD CHECK 1 - Initalizing..." << endl;
 	}
 
@@ -62,52 +66,13 @@ void Sound::Init()
 	if (m_isReady == true)
 	{
 		FMOD_Channel_SetVolume(m_channel, 1.0f);
+		FMOD_Channel_SetVolume(m_channelEffect, 1.0f);
 		//cout << "FMOD CHECK 2 - Setting Volume..." << endl;
 	}
 
 	// Plays the background initally, which will upload before starting
-	LoadFile("../../DX11Starter/audio/psycho.wav");
-	Play();
-}
-
-// --------------------------------------------------------
-// Sets up the system for the sound effects
-// --------------------------------------------------------
-void Sound::InitSE()
-{
-	// Subscribes to the event(s) that the Sound system will respond to
-	eventBus->Subscribe(this, &Sound::PlaySE);
-
-	m_result = FMOD_System_Create(&m_soundSystemEffect);
-
-	// Checks if there were no errors with creating the sound system
-	if (m_result != FMOD_OK)
-	{
-		m_isReady = false;
-		cout << "ERROR " << m_result << " " << FMOD_ErrorString(m_result);
-	}
-
-	if (m_isReady == true)
-	{
-		m_result = FMOD_System_Init(m_soundSystemEffect, 10, FMOD_INIT_3D_RIGHTHANDED, 0);
-		FMOD_System_Set3DSettings(m_soundSystemEffect, DOPPLER_SCALE, DISTANCE_FACTOR, ROLLOFF_SCALE);
-		//cout << "FMOD CHECK 1 - Initalizing Effect..." << endl;
-	}
-
-	// Checks if there were no errors with initalizing the system with
-	// the proper channels
-	if (m_result != FMOD_OK)
-	{
-		m_isReady = false;
-		cout << "ERROR " << m_result << " " << FMOD_ErrorString(m_result);
-	}
-
-	// Sets the volume for the channel
-	if (m_isReady == true)
-	{
-		FMOD_Channel_SetVolume(m_channelEffect, 1.0f);
-		//cout << "FMOD CHECK 2 - Setting Volume Effect..." << endl;
-	}
+	LoadFile(m_soundSystem, m_backgroud, "../../DX11Starter/audio/psycho.wav");
+	Play(m_soundSystem, m_channel, m_backgroud, m_position, m_altPanPos);
 }
 
 //TODO: 3D Positioning
@@ -124,34 +89,34 @@ void Sound::UpdateSound()
 // --------------------------------------------------------
 // Update the system according to the listener
 // --------------------------------------------------------
-void Sound::UpdateSystem()
+void Sound::UpdateSystem(FMOD_SYSTEM* audioSystem)
 {
-	FMOD_System_Set3DListenerAttributes(m_soundSystem, 0, &listenerPos, &listenerVelocity, &listenerForward, &listenerUp);
-	FMOD_System_Update(m_soundSystem);
+	FMOD_System_Set3DListenerAttributes(audioSystem, 0, &listenerPos, &listenerVelocity, &listenerForward, &listenerUp);
+	FMOD_System_Update(audioSystem);
 }
 
 // --------------------------------------------------------
 // Sets the volume between 0.0f and 1.0f
 // --------------------------------------------------------
-void Sound::SetVolume(float volume)
+void Sound::SetVolume(FMOD_CHANNEL* channel, float volume)
 {
 	if (m_isReady && m_isPlaying && volume >= 0.0f && volume <= 1.0f)
 	{
-		FMOD_Channel_SetVolume(m_channel, volume);
+		FMOD_Channel_SetVolume(channel, volume);
 	}
 }
 
 // --------------------------------------------------------
 // Loads the selected file from the appropriate directory
 // --------------------------------------------------------
-void Sound::LoadFile(const char * file)
+void Sound::LoadFile(FMOD_SYSTEM* audioSystem, FMOD_SOUND* sound, const char * file)
 {
 	m_currentSound = (char*)file;
 
 	if (m_isReady && m_isPlaying == true)
 	{
-		m_result = FMOD_Sound_Release(m_backgroud);
-		m_result = FMOD_System_CreateStream(m_soundSystem, m_currentSound, FMOD_3D, 0, &m_backgroud);
+		m_result = FMOD_Sound_Release(sound);
+		m_result = FMOD_System_CreateStream(audioSystem, m_currentSound, FMOD_3D, 0, &sound);
 		//cout << "FMOD CHECK 3 - Loading File..." << endl;
 
 		// If file is not found an error is displayed
@@ -169,48 +134,26 @@ void Sound::LoadFile(const char * file)
 }
 
 // --------------------------------------------------------
-// Loads the selected effect file from directory
-// --------------------------------------------------------
-void Sound::LoadFileSE(const char * file)
-{
-	m_currentSound = (char*)file;
-
-	if (m_isReady && m_isPlaying == true)
-	{
-		m_result = FMOD_Sound_Release(m_effect);
-		m_result = FMOD_System_CreateStream(m_soundSystemEffect, m_currentSound, FMOD_DEFAULT, 0, &m_effect);
-		//cout << "FMOD CHECK 3 - Loading File Effect..." << endl;
-
-		// If file is not found an error is displayed
-		if (m_result != FMOD_OK)
-		{
-			cout << "FMOD ERROR " << m_result << " " << FMOD_ErrorString(m_result);
-			m_isReady = false;
-		}
-	}
-}
-
-// --------------------------------------------------------
 // Unloads the recent loaded file
 // --------------------------------------------------------
-void Sound::UnloadFile()
+void Sound::UnloadFile(FMOD_SOUND* sound)
 {
 	if (m_isReady == true)
 	{
-		m_result = FMOD_Sound_Release(m_backgroud);
+		m_result = FMOD_Sound_Release(sound);
 	}
 }
 
 // --------------------------------------------------------
 // Plays the loaded audio file
 // --------------------------------------------------------
-void Sound::Play()
+void Sound::Play(FMOD_SYSTEM* audioSystem, FMOD_CHANNEL* channel, FMOD_SOUND* sound, FMOD_VECTOR* position, FMOD_VECTOR* altPanPos)
 {
 	if (m_isReady && m_isPlaying == true)
 	{
-		m_result = FMOD_Channel_Set3DAttributes(m_channel, m_position, 0, m_altPanPos);
-		m_result = FMOD_System_PlaySound(m_soundSystem, m_backgroud, FMOD_DEFAULT, false, &m_channel);
-		FMOD_Channel_SetMode(m_channel, FMOD_LOOP_NORMAL);
+		m_result = FMOD_Channel_Set3DAttributes(channel, position, 0, altPanPos);
+		m_result = FMOD_System_PlaySound(audioSystem, sound, FMOD_DEFAULT, false, &channel);
+		FMOD_Channel_SetMode(channel, FMOD_LOOP_NORMAL);
 		//cout << "FMOD CHECK 4 - Playing Background" << endl;
 	}
 }
@@ -218,16 +161,10 @@ void Sound::Play()
 // --------------------------------------------------------
 // Plays the loaded sound effect event
 // --------------------------------------------------------
-void Sound::PlaySE(PlayBulletFire * soundEvent)
+void Sound::SwordSlash(SwordSlashes * soundEvent)
 {
-	LoadFileSE("../../DX11Starter/audio/soundEffects/bulletFire.wav");
-
-	if (m_isReady && m_isPlaying == true)
-	{
-		m_result = FMOD_Channel_Set3DAttributes(m_channelEffect, m_position, 0, m_altPanPos);
-		m_result = FMOD_System_PlaySound(m_soundSystemEffect, m_effect, FMOD_DEFAULT, false, &m_channelEffect);
-		//cout << "Firing Bullet" << endl;
-	}
+	LoadFile(m_soundSystemEffect, m_effect, "../../DX11Starter/audio/soundEffects/bulletFire.wav");
+	Play(m_soundSystemEffect, m_channelEffect, m_effect, m_position, m_altPanPos);
 }
 
 // --------------------------------------------------------
@@ -235,12 +172,22 @@ void Sound::PlaySE(PlayBulletFire * soundEvent)
 // --------------------------------------------------------
 void Sound::ChangeBackground(SceneChange * soundEvent)
 {
-	LoadFile("../../DX11Starter/audio/backgrnd.wav");
-	Play();
+	// Wanted to create if statements depending on the scene and load
+	// the proper audio file accordingly
+	LoadFile(m_soundSystem, m_backgroud, "../../DX11Starter/audio/backgrnd.wav");
+	Play(m_soundSystem, m_channel, m_backgroud, m_position, m_altPanPos);
 }
 
 // --------------------------------------------------------
-// Returns the current played audio
+// Checks if audio is paused
+// --------------------------------------------------------
+void Sound::GetPause(FMOD_BOOL p)
+{
+	FMOD_Channel_GetPaused(m_channel, &p);
+}
+
+// --------------------------------------------------------
+// Checks if audio is playing
 // --------------------------------------------------------
 bool Sound::GetSound()
 {
@@ -250,9 +197,9 @@ bool Sound::GetSound()
 // --------------------------------------------------------
 // Sets audio pause to true or false
 // --------------------------------------------------------
-void Sound::SetPause(bool pause)
+void Sound::SetPause(FMOD_BOOL p)
 {
-	FMOD_Channel_SetPaused(m_channel, pause);
+	FMOD_Channel_SetPaused(m_channel, !p);
 }
 
 // --------------------------------------------------------
@@ -264,7 +211,7 @@ void Sound::SetSound(bool sound)
 }
 
 // --------------------------------------------------------
-// Loads the current sound and play it or unload the file
+// Loads the current sound or unload the file
 // --------------------------------------------------------
 void Sound::ToggleBackground()
 {
@@ -272,12 +219,12 @@ void Sound::ToggleBackground()
 
 	if (m_isPlaying == true)
 	{
-		LoadFile(m_currentSound);
+		LoadFile(m_soundSystem, m_backgroud, m_currentSound);
 	}
 
 	if (m_isPlaying == false)
 	{
-		UnloadFile();
+		UnloadFile(m_backgroud);
 	}
 }
 
@@ -287,7 +234,7 @@ void Sound::ToggleBackground()
 void Sound::TogglePause(PauseAudio * soundEvent)
 {
 	FMOD_BOOL p;
-	FMOD_Channel_GetPaused(m_channel, &p);
-	FMOD_Channel_SetPaused(m_channel, !p);
+	GetPause(p);
+	SetPause(p);
 	cout << "Audio Pause Status (0 - Pause | 1 - Play): " << p << endl;
 }
