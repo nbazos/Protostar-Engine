@@ -1,6 +1,6 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context)
+GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context, XMFLOAT3 position, XMFLOAT3 scale, XMFLOAT3 rotation, float isStatic)
 {
 	entityName = name;
 	entityMesh = mesh;
@@ -9,9 +9,31 @@ GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11
 
 	XMMATRIX W = XMMatrixIdentity();
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W));
-	position = XMFLOAT3(0, 0, 0);
-	scale = XMFLOAT3(1, 1, 1);
-	rotation = XMFLOAT3(0, 0, 0);
+	this->position = position;
+	this->scale = scale;
+	this->rotation = rotation;
+
+	// Physics
+
+	this->collShape = new btBoxShape(btVector3(btScalar(scale.x/2.0f), btScalar(scale.y/2.0f), btScalar(scale.z/2.0f)));
+
+	btTransform groundTransform;
+	groundTransform.setIdentity();
+	groundTransform.setOrigin(btVector3(position.x, position.y, position.z));
+
+	btScalar mass(isStatic);
+
+	//rigidbody is dynamic if and only if mass is non zero, otherwise static
+	bool isDynamic = (mass != 0.f);
+
+	btVector3 localInertia(0, 0, 0);
+	if (isDynamic)
+		collShape->calculateLocalInertia(mass, localInertia);
+
+	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, collShape, localInertia);
+	this->rBody = new btRigidBody(rbInfo);
 }
 
 GameEntity::~GameEntity()
@@ -49,8 +71,15 @@ void GameEntity::SetRotation(float pitch, float yaw, float roll)
 	rotation.z = roll * XM_PI / 180;
 }
 
+btRigidBody * GameEntity::GetRBody()
+{
+	return rBody;
+}
+
 void GameEntity::MoveAbsolute(float translationX, float translationY, float translationZ)
 {
+	// publish an event type to go to bullet physics and set position there to solve input issue?
+
 	position.x += translationX;
 	position.y += translationY;
 	position.z += translationZ;
