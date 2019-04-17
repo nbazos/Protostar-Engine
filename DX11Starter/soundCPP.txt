@@ -1,3 +1,5 @@
+https://github.com/joshuajnoble/Programming-Interactivity-Code/tree/master/ch10/1005
+
 #include "Sound.h"
 
 // Attritbutes

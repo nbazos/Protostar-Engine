@@ -66,6 +66,7 @@ public:
 	static bool m_isPlaying;
 	static bool m_isReady;
 	static char * m_currentSound;
+	float cameraPosition;
 
 private:
 	
