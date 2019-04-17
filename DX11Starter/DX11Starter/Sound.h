@@ -25,7 +25,7 @@ struct Vector3
 	float z;
 };
 
-struct SoundImplement : public System
+struct SoundImplement
 {
 	SoundImplement();
 	~SoundImplement();
@@ -42,13 +42,11 @@ struct SoundImplement : public System
 	typedef map<string, FMOD::Studio::EventInstance*> EventMap;
 	typedef map<string, FMOD::Studio::Bank*> BankMap;
 
-	BankMap m_Banks;
-	EventMap m_Events;
 	SoundMap m_Sounds;
 	ChannelMap m_Channels;
+	EventMap m_Events;
+	BankMap m_Banks;	
 };
-
-
 
 // --------------------------------------------------------
 // Necessary methods for proper sound engine
@@ -56,7 +54,9 @@ struct SoundImplement : public System
 class Sound : public System
 {
 public:
+	Sound() {};
 	Sound(EventBus * eventBusPtr) : System(eventBusPtr) {};
+	~Sound() {};
 
 	static void Init();
 	static void Update();
@@ -66,9 +66,9 @@ public:
 	void LoadBank(const string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags);
 	void LoadEvent(const string& eventName);
 	void LoadSound(const string & soundName, bool b_3d = true, bool b_Looping = false, bool b_Stream = false);
-	void UnLoadSound(const string & soundName);
+	void UnloadSound(const string & soundName);
 	void Set3dListenerAndOrientation(const Vector3& pos, const Vector3& look, const Vector3& up);
-	int PlaySounds(const string& soundName, const Vector3& pos = Vector3{ 0, 0, 0 }, float volumedB = 0.0f);
+	int PlaySound(const string& soundName, const Vector3& pos = Vector3{ 0, 0, 0 }, float volumedB = 0.0f);
 	void PlayEvent(const string& eventName);
 	void StopChannel(int channelId);
 	void StopEvent(const string& eventName, bool bImmediate = false);
