@@ -1,300 +1,245 @@
 #include "Sound.h"
 
-// Attritbutes
-bool Sound::m_isPlaying = true;
-bool Sound::m_isReady = true;
-char* Sound::m_currentSound;
-
-FMOD_RESULT Sound::m_result;
-FMOD_SYSTEM* Sound::m_soundSystem;
-FMOD_SYSTEM* Sound::m_soundSystemEffect;
-FMOD_SOUND* Sound::m_background;
-FMOD_SOUND* Sound::m_effect;
-FMOD_CHANNEL* Sound::m_channel;
-FMOD_CHANNEL* Sound::m_channelEffect;
-FMOD_CHANNELGROUP* Sound::m_channelGroup;
-FMOD_VECTOR Sound::listenerVelocity, Sound::listenerUp, Sound::listenerForward, Sound::listenerPos, Sound::soundPos, Sound::soundVelocity;
-FMOD_VECTOR* Sound::m_position;
-FMOD_VECTOR* Sound::m_altPanPos;
-
-Sound::~Sound()
+SoundImplement::SoundImplement()
 {
+	m_soundSystem = NULL;
+	Sound::ErrorCheck(FMOD::Studio::System::create(&m_soundSystem));
+	Sound::ErrorCheck(m_soundSystem->initialize(32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, NULL));
 
+	m_system = NULL;
+	Sound::ErrorCheck(m_soundSystem->getLowLevelSystem(&m_system));
 }
 
-// --------------------------------------------------------
-// Initializes the audio engine system(s)
-// --------------------------------------------------------
-void Sound::Init()
+SoundImplement::~SoundImplement()
 {
-	// Subscribes to the event(s) that the Sound system will respond to
-	eventBus->Subscribe(this, &Sound::TogglePause);
-	eventBus->Subscribe(this, &Sound::ChangeBackground);
-	eventBus->Subscribe(this, &Sound::SwordSlash);
-
-	m_result = FMOD_System_Create(&m_soundSystem);
-	m_result = FMOD_System_Create(&m_soundSystemEffect);
-
-	// Checks if there were no errors with creating the sound system
-	if (m_result != FMOD_OK)
-	{
-		m_isReady = false;
-		cout << "ERROR 1: " << m_result << " " << FMOD_ErrorString(m_result);
-	}
-
-	if (m_isReady == true)
-	{
-		// Standard Sound System
-		m_result = FMOD_System_Init(m_soundSystem, 10, FMOD_INIT_3D_RIGHTHANDED, 0);
-		FMOD_System_Set3DSettings(m_soundSystem, DOPPLER_SCALE, DISTANCE_FACTOR, ROLLOFF_SCALE);
-
-		// Sound Effect System
-		m_result = FMOD_System_Init(m_soundSystemEffect, 10, FMOD_INIT_3D_RIGHTHANDED, 0);
-		FMOD_System_Set3DSettings(m_soundSystemEffect, DOPPLER_SCALE, DISTANCE_FACTOR, ROLLOFF_SCALE);
-
-		FMOD_System_GetMasterChannelGroup(m_soundSystem, &m_channelGroup);
-
-		//cout << "FMOD CHECK 1 - Initalizing..." << endl;
-	}
-
-	listenerVelocity.x = 1;
-	listenerVelocity.y = 1;
-	listenerVelocity.z = 1;
-
-	listenerUp.y = 1;
-
-	listenerForward.z = 1;
-
-	soundPos.x = 3;
-	soundPos.y = 3;
-	soundPos.z = 2;
-
-	soundVelocity.x = 1;
-	soundVelocity.y = 1;
-	soundVelocity.z = 1;
-
-	// Checks if there were no errors with initalizing the system with
-	// the proper channels
-	if (m_result != FMOD_OK)
-	{
-		m_isReady = false;
-		cout << "ERROR 2: " << m_result << " " << FMOD_ErrorString(m_result);
-	}
-
-	// Sets the volume for the channel
-	if (m_isReady == true)
-	{
-		FMOD_Channel_SetVolume(m_channel, 1.0f);
-		FMOD_Channel_SetVolume(m_channelEffect, 1.0f);
-		//cout << "FMOD CHECK 2 - Setting Volume..." << endl;
-	}
-
-	// Plays the background initally, which will upload before starting
-	//LoadFile(m_soundSystem, m_background, "../../DX11Starter/audio/psycho.wav"); --> 'm_background' returns NULL and audio does not play
-	LoadFile("../../DX11Starter/audio/psycho.wav");
-	Play(m_soundSystem, m_channel, m_background, m_position, m_altPanPos);
+	Sound::ErrorCheck(m_soundSystem->unloadAll());
+	Sound::ErrorCheck(m_soundSystem->release());
 }
 
-//TODO: 3D Positioning
-void Sound::UpdateListener(Vector3 pos, Vector3 velocity, Vector3 forward, Vector3 up)
+void SoundImplement::Update() 
 {
-	// Used to update the listener's position for more 3D aspects
-	listenerVelocity.x = velocity.x;
-	listenerVelocity.y = velocity.y;
-	listenerVelocity.z = velocity.z;
-
-	listenerPos.x = pos.x;
-	listenerPos.y = pos.y;
-	listenerPos.z = pos.z;
-
-	listenerForward.x = forward.x;
-	listenerForward.y = forward.y;
-	listenerForward.z = forward.z;
-
-	listenerUp.x = up.x;
-	listenerUp.y = up.y;
-	listenerUp.z = up.z;
-
-	FMOD_System_Set3DListenerAttributes(m_soundSystem, 0, &listenerPos, &listenerVelocity, &listenerForward, &listenerUp);
-}
-
-void Sound::UpdateSound(Vector3 pos, Vector3 velocity)
-{
-	// Used to update sound position based off game
-	soundPos.x = pos.x;
-	soundPos.y = pos.y;
-	soundPos.z = pos.z;
-
-	soundVelocity.x = velocity.x;
-	soundVelocity.y = velocity.y;
-	soundVelocity.z = velocity.z;
-
-	FMOD_Channel_Set3DAttributes(m_channel, &soundPos, &soundVelocity, m_altPanPos);
-}
-
-// --------------------------------------------------------
-// Update the system according to the listener
-// --------------------------------------------------------
-void Sound::UpdateSystem(FMOD_SYSTEM* audioSystem, Vector3 pos, Vector3 velocity, Vector3 forward, Vector3 up)
-{
-	UpdateListener(pos, velocity, forward, up);
-	UpdateSound(pos, velocity);
-	FMOD_System_Update(audioSystem);
-}
-// --------------------------------------------------------
-// Sets the volume between 0.0f and 1.0f
-// --------------------------------------------------------
-void Sound::SetVolume(FMOD_CHANNEL* channel, float volume)
-{
-	if (m_isReady && m_isPlaying && volume >= 0.0f && volume <= 1.0f)
+	vector<ChannelMap::iterator> pStoppedChannels;
+	for (auto it = m_Channels.begin(), itEnd = m_Channels.end(); it != itEnd; ++it)
 	{
-		FMOD_Channel_SetVolume(channel, volume);
-	}
-}
-
-// --------------------------------------------------------
-// Loads the selected file from the appropriate directory
-// --------------------------------------------------------
-void Sound::LoadFile(FMOD_SYSTEM* audioSystem, FMOD_SOUND* sound, const char * file)
-{
-	m_currentSound = (char*)file;
-
-	if (m_isReady && m_isPlaying == true)
-	{
-		m_result = FMOD_Sound_Release(sound);
-		m_result = FMOD_System_CreateStream(audioSystem, m_currentSound, FMOD_3D, 0, &sound);
-
-		//cout << "FMOD CHECK 3 - Loading File..." << endl;
-
-		// If file is not found an error is displayed
-		if (m_result != FMOD_OK)
+		bool bIsPlaying = false;
+		it->second->isPlaying(&bIsPlaying);
+		if (!bIsPlaying)
 		{
-			cout << "FMOD ERROR " << m_result << " " << FMOD_ErrorString(m_result);
-			m_isReady = false;
+			pStoppedChannels.push_back(it);
 		}
 	}
-
-	// Sets a channels priority. Higher priority means it is less likely to get discarded when
-	// FSOUND_FREE is used to select a channel, when all channels are being used, and one has to
-	// be rejected.If a channel has an equal priority then it will be replaced.
-	// FMOD_Channel_SetPriority(m_channel, 255);
+	for (auto& it : pStoppedChannels)
+	{
+		m_Channels.erase(it);
+	}
+	Sound::ErrorCheck(m_soundSystem->update());
 }
 
-void Sound::LoadFile(const char * file)
+SoundImplement* audioImplemenet = nullptr;
+
+void Sound::Init() 
 {
-	m_currentSound = (char*)file;
+	audioImplemenet = new SoundImplement;
+}
 
-	if (m_isReady && m_isPlaying == true)
+void Sound::Update() {
+	audioImplemenet->Update();
+}
+
+void Sound::LoadSound(const std::string& soundName, bool b_3d, bool b_Looping, bool b_Stream)
+{
+	auto tFoundIt = audioImplemenet->m_Sounds.find(soundName);
+	if (tFoundIt != audioImplemenet->m_Sounds.end())
+		return;
+	FMOD_MODE eMode = FMOD_DEFAULT;
+	eMode |= b_3d ? FMOD_3D : FMOD_2D;
+	eMode |= b_Looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+	eMode |= b_Stream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
+	FMOD::Sound* pSound = nullptr;
+	Sound::ErrorCheck(audioImplemenet->m_system->createSound(soundName.c_str(), eMode, nullptr, &pSound));
+	if (pSound) 
 	{
-
-		m_result = FMOD_Sound_Release(m_background);
-		m_result = FMOD_System_CreateStream(m_soundSystem, m_currentSound, FMOD_3D, 0, &m_background);
-		//cout << "FMOD CHECK 3 - Loading File..." << endl;
+		audioImplemenet->m_Sounds[soundName] = pSound;
 	}
 }
 
-// --------------------------------------------------------
-// Unloads the recent loaded file
-// --------------------------------------------------------
-void Sound::UnloadFile(FMOD_SOUND* sound)
+void Sound::UnLoadSound(const std::string& soundName)
 {
-	if (m_isReady == true)
+	auto tFoundIt = audioImplemenet->m_Sounds.find(soundName);
+	if (tFoundIt == audioImplemenet->m_Sounds.end())
+		return;
+	Sound::ErrorCheck(tFoundIt->second->release());
+	audioImplemenet->m_Sounds.erase(tFoundIt);
+}
+
+int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumedB)
+{
+	int channelId = audioImplemenet->m_nextChannelId++;
+	auto tFoundIt = audioImplemenet->m_Sounds.find(soundName);
+	if (tFoundIt == audioImplemenet->m_Sounds.end())
 	{
-		m_result = FMOD_Sound_Release(sound);
+		LoadSound(soundName);
+		tFoundIt = audioImplemenet->m_Sounds.find(soundName);
+		if (tFoundIt == audioImplemenet->m_Sounds.end())
+		{
+			return channelId;
+		}
+	}
+	FMOD::Channel* pChannel = nullptr;
+	Sound::ErrorCheck(audioImplemenet->m_system->playSound(tFoundIt->second, nullptr, true, &pChannel));
+	if (pChannel)
+	{
+		FMOD_MODE currMode;
+		tFoundIt->second->getMode(&currMode);
+		if (currMode & FMOD_3D) 
+		{
+			FMOD_VECTOR position = VectorToFmod(pos);
+			Sound::ErrorCheck(pChannel->set3DAttributes(&position, nullptr));
+		}
+		Sound::ErrorCheck(pChannel->setVolume(dbToVolume(volumedB)));
+		Sound::ErrorCheck(pChannel->setPaused(false));
+		audioImplemenet->m_Channels[channelId] = pChannel;
+	}
+	return channelId;
+}
+
+void Sound::SetChannel3dPosition(int channelId, const Vector3& pos)
+{
+	auto tFoundIt = audioImplemenet->m_Channels.find(channelId);
+	if (tFoundIt == audioImplemenet->m_Channels.end())
+		return;
+
+	FMOD_VECTOR position = VectorToFmod(pos);
+	Sound::ErrorCheck(tFoundIt->second->set3DAttributes(&position, NULL));
+}
+
+void Sound::SetChannelVolume(int channelId, float volumedB)
+{
+	auto tFoundIt = audioImplemenet->m_Channels.find(channelId);
+	if (tFoundIt == audioImplemenet->m_Channels.end())
+		return;
+
+	Sound::ErrorCheck(tFoundIt->second->setVolume(dbToVolume(volumedB)));
+}
+
+void Sound::LoadBank(const std::string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags) 
+{
+	auto tFoundIt = audioImplemenet->m_Banks.find(bankName);
+	if (tFoundIt != audioImplemenet->m_Banks.end())
+		return;
+	FMOD::Studio::Bank* pBank;
+	Sound::ErrorCheck(audioImplemenet->m_soundSystem->loadBankFile(bankName.c_str(), flags, &pBank));
+	if (pBank) 
+	{
+		audioImplemenet->m_Banks[bankName] = pBank;
 	}
 }
 
-// --------------------------------------------------------
-// Plays the loaded audio file
-// --------------------------------------------------------
-void Sound::Play(FMOD_SYSTEM* audioSystem, FMOD_CHANNEL* channel, FMOD_SOUND* sound, FMOD_VECTOR* position, FMOD_VECTOR* altPanPos)
+void Sound::LoadEvent(const std::string& eventName)
 {
-	if (m_isReady && m_isPlaying == true)
+	auto tFoundit = audioImplemenet->m_Events.find(eventName);
+	if (tFoundit != audioImplemenet->m_Events.end())
+		return;
+	FMOD::Studio::EventDescription* pEventDescription = NULL;
+	Sound::ErrorCheck(audioImplemenet->m_soundSystem->getEvent(eventName.c_str(), &pEventDescription));
+	if (pEventDescription) 
 	{
-		m_result = FMOD_Channel_Set3DAttributes(channel, position, 0, altPanPos);
-		m_result = FMOD_System_PlaySound(audioSystem, sound, FMOD_DEFAULT, false, &channel);
-		FMOD_Channel_SetMode(channel, FMOD_LOOP_NORMAL);
-		//cout << "FMOD CHECK 4 - Playing Background" << endl;
+		FMOD::Studio::EventInstance* pEventInstance = NULL;
+		Sound::ErrorCheck(pEventDescription->createInstance(&pEventInstance));
+		if (pEventInstance) 
+		{
+			audioImplemenet->m_Events[eventName] = pEventInstance;
+		}
 	}
 }
 
-// --------------------------------------------------------
-// Plays the loaded sound effect event
-// --------------------------------------------------------
-void Sound::SwordSlash(SwordSlashes * soundEvent)
+void Sound::PlayEvent(const string &eventName) 
 {
-	LoadFile(m_soundSystemEffect, m_effect, "../../DX11Starter/audio/soundEffects/bulletFire.wav");
-	Play(m_soundSystemEffect, m_channelEffect, m_effect, m_position, m_altPanPos);
-}
-
-// --------------------------------------------------------
-// Changes background audio based on the scene
-// --------------------------------------------------------
-void Sound::ChangeBackground(SceneChange * soundEvent)
-{
-	// Wanted to create if statements depending on the scene and load
-	// the proper audio file accordingly
-	LoadFile(m_soundSystem, m_background, "../../DX11Starter/audio/backgrnd.wav");
-	Play(m_soundSystem, m_channel, m_background, m_position, m_altPanPos);
-}
-
-// --------------------------------------------------------
-// Checks if audio is paused
-// --------------------------------------------------------
-void Sound::GetPause(FMOD_BOOL p)
-{
-	FMOD_Channel_GetPaused(m_channel, &p);
-}
-
-// --------------------------------------------------------
-// Checks if audio is playing
-// --------------------------------------------------------
-bool Sound::GetSound()
-{
-	return m_isPlaying;
-}
-
-// --------------------------------------------------------
-// Sets audio pause to true or false
-// --------------------------------------------------------
-void Sound::SetPause(FMOD_BOOL p)
-{
-	FMOD_Channel_SetPaused(m_channel, !p);
-}
-
-// --------------------------------------------------------
-// Sets sound to true or false
-// --------------------------------------------------------
-void Sound::SetSound(bool sound)
-{
-	m_isPlaying = sound;
-}
-
-// --------------------------------------------------------
-// Loads the current sound or unload the file
-// --------------------------------------------------------
-void Sound::ToggleBackground()
-{
-	m_isPlaying = !m_isPlaying;
-
-	if (m_isPlaying == true)
+	auto tFoundit = audioImplemenet->m_Events.find(eventName);
+	if (tFoundit == audioImplemenet->m_Events.end()) 
 	{
-		LoadFile(m_soundSystem, m_background, m_currentSound);
+		LoadEvent(eventName);
+		tFoundit = audioImplemenet->m_Events.find(eventName);
+		if (tFoundit == audioImplemenet->m_Events.end())
+			return;
 	}
-
-	if (m_isPlaying == false)
-	{
-		UnloadFile(m_background);
-	}
+	tFoundit->second->start();
 }
 
-// --------------------------------------------------------
-// Pauses or unpauses the current channel
-// --------------------------------------------------------
-void Sound::TogglePause(PauseAudio * soundEvent)
+void Sound::StopEvent(const string &eventName, bool bImmediate) 
 {
-	FMOD_BOOL p;
-	GetPause(p);
-	SetPause(p);
-	cout << "Audio Pause Status (0 - Pause | 1 - Play): " << p << endl;
+	auto tFoundIt = audioImplemenet->m_Events.find(eventName);
+	if (tFoundIt == audioImplemenet->m_Events.end())
+		return;
+	FMOD_STUDIO_STOP_MODE eMode;
+	eMode = bImmediate ? FMOD_STUDIO_STOP_IMMEDIATE : FMOD_STUDIO_STOP_ALLOWFADEOUT;
+	Sound::ErrorCheck(tFoundIt->second->stop(eMode));
+}
+
+bool Sound::IsEventPlaying(const string &eventName) const 
+{
+	auto tFoundIt = audioImplemenet->m_Events.find(eventName);
+	if (tFoundIt == audioImplemenet->m_Events.end())
+		return false;
+
+	FMOD_STUDIO_PLAYBACK_STATE* state = NULL;
+	if (tFoundIt->second->getPlaybackState(state) == FMOD_STUDIO_PLAYBACK_PLAYING) {
+		return true;
+	}
+	return false;
+}
+
+void Sound::GetEventParameter(const string &eventName, const string &strParameterName, float* parameter) 
+{
+	auto tFoundIt = audioImplemenet->m_Events.find(eventName);
+	if (tFoundIt == audioImplemenet->m_Events.end())
+		return;
+	FMOD::Studio::ParameterInstance* pParameter = NULL;
+	Sound::ErrorCheck(tFoundIt->second->getParameter(strParameterName.c_str(), &pParameter));
+	Sound::ErrorCheck(pParameter->getValue(parameter));
+}
+
+void Sound::SetEventParameter(const string &eventName, const string &strParameterName, float fValue) 
+{
+	auto tFoundIt = audioImplemenet->m_Events.find(eventName);
+	if (tFoundIt == audioImplemenet->m_Events.end())
+		return;
+	FMOD::Studio::ParameterInstance* pParameter = NULL;
+	Sound::ErrorCheck(tFoundIt->second->getParameter(strParameterName.c_str(), &pParameter));
+	Sound::ErrorCheck(pParameter->setValue(fValue));
+}
+
+FMOD_VECTOR Sound::VectorToFmod(const Vector3& vPosition) 
+{
+	FMOD_VECTOR fVec;
+	fVec.x = vPosition.x;
+	fVec.y = vPosition.y;
+	fVec.z = vPosition.z;
+	return fVec;
+}
+
+int Sound::ErrorCheck(FMOD_RESULT result) 
+{
+	if (result != FMOD_OK)
+	{
+		cout << "FMOD ERROR " << result << endl;
+		return 1;
+	}
+	// cout << "FMOD all good" << endl;
+	return 0;
+}
+
+float  Sound::dbToVolume(float dB)
+{
+	return powf(10.0f, 0.05f * dB);
+}
+
+float  Sound::VolumeTodB(float volume)
+{
+	return 20.0f * log10f(volume);
+}
+
+void Sound::Shutdown() 
+{
+	delete audioImplemenet;
 }

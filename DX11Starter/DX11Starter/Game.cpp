@@ -104,7 +104,7 @@ void Game::Init()
 	CreateBasicGeometry();
 	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
 	renderSystem.Init();
-	soundEngine = Sound(&eventBus);
+	soundEngine = 
 	soundEngine.Init();
 
 	// Tell the input assembler stage of the pipeline what kind of
