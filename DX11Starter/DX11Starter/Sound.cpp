@@ -138,7 +138,12 @@ int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumed
 		if (currMode & FMOD_3D)
 		{
 			FMOD_VECTOR position = VectorToFmod(pos);
-			Sound::ErrorCheck(pChannel->set3DAttributes(&position, nullptr));
+			FMOD_VECTOR velocity = { (pos.x - position.x), (pos.y - position.y), (pos.z - position.z) };
+			//FMOD_VECTOR direction = { 1.0f, 2.0f, 3.0f };
+			Sound::ErrorCheck(pChannel->set3DAttributes(&position, &velocity));
+			//Sound::ErrorCheck(pChannel->set3DConeOrientation(&direction));
+			//Sound::ErrorCheck(pChannel->set3DConeSettings(30.0f, 60.0f, 0.5f));
+			//Sound::ErrorCheck(pChannel->set3DMinMaxDistance(1.0f, 1000.0f));
 		}
 		Sound::ErrorCheck(pChannel->setVolume(dbToVolume(volumedB)));
 		Sound::ErrorCheck(pChannel->setPaused(false));
@@ -147,22 +152,14 @@ int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumed
 	return channelId;
 }
 
-void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& look, const Vector3& up) 
+void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity, const Vector3& forward, const Vector3& up) 
 {
-	// Used to update the listener's position for more 3D aspects
-	/*listenerPos.x = pos.x;
-	listenerPos.y = pos.y;
-	listenerPos.z = pos.z;
+	FMOD_VECTOR v3_position = VectorToFmod(pos);
+	FMOD_VECTOR v3_velocity = VectorToFmod(velocity);
+	FMOD_VECTOR v3_forward = VectorToFmod(forward);
+	FMOD_VECTOR v3_up = VectorToFmod(up);
 
-	listenerForward.x = look.x;
-	listenerForward.y = look.y;
-	listenerForward.z = look.z;
-
-	listenerUp.x = up.x;
-	listenerUp.y = up.y;
-	listenerUp.z = up.z;*/
-
-	//FMOD_System_Set3DListenerAttributes(m_system, 0, &listenerPos, &listenerVelocity, &listenerForward, &listenerUp);
+	soundImplemenet->m_system->set3DListenerAttributes(0, &v3_position, &v3_velocity, &v3_forward, &v3_up);
 }
 
 // --------------------------------------------------------
