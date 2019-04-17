@@ -1,5 +1,8 @@
 #pragma once
 
+// --------------------------------------------------------
+// Prevents multiple definitions of objects in the header
+// --------------------------------------------------------
 #ifndef _SOUND_ENGINE_H
 #define _SOUND_ENGINE_H
 
@@ -18,6 +21,9 @@
 
 using namespace std;
 
+// --------------------------------------------------------
+// Used to place sound in the 3D space
+// --------------------------------------------------------
 struct Vector3
 {
 	float x;
@@ -25,6 +31,11 @@ struct Vector3
 	float z;
 };
 
+// --------------------------------------------------------
+// Contains the code for initializing and shutting down
+// the sound engine; SoundImplement also holds a map of all
+// the sounds played in our project
+// --------------------------------------------------------
 struct SoundImplement
 {
 	SoundImplement();
@@ -68,7 +79,7 @@ public:
 	void LoadSound(const string & soundName, bool b_3d = true, bool b_Looping = false, bool b_Stream = false);
 	void UnloadSound(const string & soundName);
 	void Set3dListenerAndOrientation(const Vector3& pos, const Vector3& look, const Vector3& up);
-	int PlaySound(const string& soundName, const Vector3& pos = Vector3{ 0, 0, 0 }, float volumedB = 0.0f);
+	int PlaySounds(const string& soundName, const Vector3& pos = Vector3{ 0, 0, 0 }, float volumedB = 0.0f);
 	void PlayEvent(const string& eventName);
 	void StopChannel(int channelId);
 	void StopEvent(const string& eventName, bool bImmediate = false);
