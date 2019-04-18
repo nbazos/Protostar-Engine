@@ -11,7 +11,6 @@
 #define ROLLOFF_SCALE         0.5
 
 #include "System.h"
-#include "Camera.h"
 #include "inc/fmod_studio.hpp"
 #include "inc/fmod.hpp"
 #include <string>

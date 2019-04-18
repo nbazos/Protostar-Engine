@@ -12,7 +12,6 @@ void SceneManager::Update(float deltaT, float totalT)
 	deltaTime = deltaT;
 	totalTime = totalT;
 	sceneCamera->Update(deltaT);
-
 }
 
 void SceneManager::AddEntityToScene(GameEntity entity)

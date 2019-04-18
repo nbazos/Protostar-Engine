@@ -21,6 +21,9 @@ SoundImplement::~SoundImplement()
 	Sound::ErrorCheck(m_system->release());
 }
 
+// --------------------------------------------------------
+// Checks channels and update system
+// --------------------------------------------------------
 void SoundImplement::Update()
 {
 	// If a channel has stopped playing, we destroy it so 
@@ -64,6 +67,10 @@ void Sound::Init()
 // --------------------------------------------------------
 void Sound::Update()
 {
+	// Update the sound's position here
+
+	//Set3dListenerAndOrientation(Vector3(), Vector3(), Vector3(), Vector3());	<--- Will go HERE
+
 	soundImplemenet->Update();
 }
 
@@ -138,20 +145,24 @@ int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumed
 		if (currMode & FMOD_3D)
 		{
 			FMOD_VECTOR position = VectorToFmod(pos);
-			FMOD_VECTOR velocity = { (pos.x - position.x), (pos.y - position.y), (pos.z - position.z) };
-			//FMOD_VECTOR direction = { 1.0f, 2.0f, 3.0f };
+			FMOD_VECTOR velocity = { ((pos.x) - position.x), (pos.y - position.y), (pos.z - position.z) };
+			FMOD_VECTOR direction = { 1.0f, 2.0f, 3.0f };
 			Sound::ErrorCheck(pChannel->set3DAttributes(&position, &velocity));
-			//Sound::ErrorCheck(pChannel->set3DConeOrientation(&direction));
-			//Sound::ErrorCheck(pChannel->set3DConeSettings(30.0f, 60.0f, 0.5f));
-			//Sound::ErrorCheck(pChannel->set3DMinMaxDistance(1.0f, 1000.0f));
+			Sound::ErrorCheck(pChannel->set3DConeOrientation(&direction));
+			Sound::ErrorCheck(pChannel->set3DConeSettings(30.0f, 60.0f, 0.5f));
+			Sound::ErrorCheck(pChannel->set3DMinMaxDistance(1.0f, 1000.0f));
 		}
 		Sound::ErrorCheck(pChannel->setVolume(dbToVolume(volumedB)));
 		Sound::ErrorCheck(pChannel->setPaused(false));
+
 		soundImplemenet->m_Channels[channelId] = pChannel;
 	}
 	return channelId;
 }
 
+// --------------------------------------------------------
+// Updates the listeners position and orientation
+// --------------------------------------------------------
 void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity, const Vector3& forward, const Vector3& up) 
 {
 	FMOD_VECTOR v3_position = VectorToFmod(pos);
@@ -265,6 +276,9 @@ void Sound::StopEvent(const string &eventName, bool bImmediate)
 	Sound::ErrorCheck(t_FoundIt->second->stop(eMode));
 }
 
+// --------------------------------------------------------
+// Checks if a channel is playing
+// --------------------------------------------------------
 bool Sound::IsPlaying(int channelId) const
 {
 	//auto t_FoundIt = soundImplemenet->m_Channels.find(channelId);

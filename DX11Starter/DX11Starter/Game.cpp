@@ -107,7 +107,7 @@ void Game::Init()
 	soundEngine = Sound(&eventBus);
 	soundEngine.Init();
 	soundEngine.LoadSound("../../DX11Starter/audio/psycho.wav", true, true);
-	soundEngine.PlaySounds("../../DX11Starter/audio/psycho.wav", Vector3{ 5, 0, -50}, 1.0);
+	soundEngine.PlaySounds("../../DX11Starter/audio/psycho.wav", Vector3{ 5, 0, -30}, 1.0);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
