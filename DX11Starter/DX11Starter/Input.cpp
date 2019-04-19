@@ -29,6 +29,18 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 		eventBus->Publish(ie);
 		delete ie;
 	}
+	if (GetKeyState(VK_SPACE))
+	{
+		InputJump * ie = DBG_NEW InputJump();
+		eventBus->Publish(ie);
+		delete ie;
+	}
+	if (GetKeyState(VK_ADD))
+	{
+		InputQuickAddEntity * ie = DBG_NEW InputQuickAddEntity();
+		eventBus->Publish(ie);
+		delete ie;
+	}
 }
 
 void Input::ProcessKeyUp(WPARAM keyCode)

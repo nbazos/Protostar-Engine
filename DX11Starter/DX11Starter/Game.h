@@ -4,7 +4,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "Render.h"
-
+// #include "BulletPhysics.h"
 #include <WICTextureLoader.h>
 
 class Game : public DXCore {
@@ -58,6 +58,8 @@ private:
 	Input inputSystem;
 	SceneManager sceneManager;
 	Render renderSystem;
+	// BulletPhysics physicsSystem;
+
 
 	std::string vkToString(int vk); // helper method to tell if and when keys are being
 };

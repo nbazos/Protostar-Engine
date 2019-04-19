@@ -13,7 +13,7 @@ class Render
 {
 public:
 	Render() {};
-	Render(ID3D11DeviceContext*	context, ID3D11Device* device, float width, float height, ID3D11RenderTargetView* backBufferRTV, ID3D11DepthStencilView* depthStencilView, IDXGISwapChain* swapChain, std::vector<GameEntity> * entities, Camera * cam);
+	Render(ID3D11DeviceContext*	context, ID3D11Device* device, unsigned int width, unsigned int height, ID3D11RenderTargetView* backBufferRTV, ID3D11DepthStencilView* depthStencilView, IDXGISwapChain* swapChain, std::vector<GameEntity> * entities, Camera * cam);
 	~Render() {};
 
 	void Init();
@@ -24,8 +24,8 @@ public:
 private:
 	ID3D11DeviceContext* context;
 	ID3D11Device* device;
-	float width;
-	float height;
+	unsigned int width;
+	unsigned int height;
 	ID3D11RenderTargetView* backBufferRTV;
 	ID3D11DepthStencilView* depthStencilView;
 	IDXGISwapChain* swapChain;

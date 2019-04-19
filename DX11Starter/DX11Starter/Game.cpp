@@ -71,6 +71,9 @@ Game::~Game()
 
 	// Delete Meshes & GameEntities
 	for (auto& m : meshes) delete m;
+
+	// Deallocate Physics System
+	sceneManager.ExitPhysics();
 }
 
 // --------------------------------------------------------
@@ -93,7 +96,7 @@ void Game::Init()
 	dirLight1 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f) };
 	dirLight2 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
 
-	// Engine Subsystem & CommunicationI nitialization
+	// Engine Subsystem & Communication Initialization
 	eventBus = EventBus();
 	inputSystem = Input(&eventBus);
 	sceneManager = SceneManager(&eventBus, camera);
@@ -101,6 +104,7 @@ void Game::Init()
 	CreateBasicGeometry();
 	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
 	renderSystem.Init();
+	
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -151,24 +155,22 @@ void Game::CreateMaterials()
 void Game::CreateBasicGeometry()
 {
 	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
-	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
+	Mesh* playerMesh = new Mesh("../../Assets/Models/sphere.obj", device);
 	meshes.push_back(cubeMesh);
-	meshes.push_back(coneMesh);
-
+	meshes.push_back(playerMesh);
+	
 	// Create GameEntities that utilize the meshes
-	GameEntity cone = GameEntity("Player", coneMesh, material1, context);
-	GameEntity cube = GameEntity("Floor", cubeMesh, material1, context);
+	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 
-	// Set transformations
-	cube.SetScale(5.0f, 1.0f, 1.0f);
-	cube.SetPosition(0, -2.0f, 0);
-	cube.SetRotation(0.0f, 0.0f, 0.0f);
-
-	cone.SetScale(0.5f, 0.5f, 0.5f);
-	cone.SetPosition(2, -1, 0);
-
-	sceneManager.AddEntityToScene(cone);
-	sceneManager.AddEntityToScene(cube);
+	sceneManager.AddEntityToScene(player);
+	sceneManager.AddEntityToScene(floor);
+	sceneManager.AddEntityToScene(platform1);
+	sceneManager.AddEntityToScene(platform2);
+	sceneManager.AddEntityToScene(crate);
 }
 
 // --------------------------------------------------------

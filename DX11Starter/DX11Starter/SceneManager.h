@@ -13,6 +13,9 @@ public:
 	void Init();
 	void Update(float deltaT, float totalT);
 
+	void PhysicsUpdate();
+	void ExitPhysics();
+
 	void AddEntityToScene(GameEntity entity);
 	//void RemoveEntityFromScene(char * entityName);
 	std::vector<GameEntity>* GetSceneEntities();
@@ -23,7 +26,19 @@ private:
 	float deltaTime;
 	float totalTime;
 
+	// Player Control
 	void MovePlayerLeft(InputMoveLeft * inputEvent);
 	void MovePlayerRight(InputMoveRight * inputEvent);
+	void PlayerJump(InputJump * inputEvent);
+
+	// Utility
+	void QuickAddEntity(InputQuickAddEntity * inputEvent);
+
+	// Physics
+	btDefaultCollisionConfiguration* collisionConfiguration;
+	btCollisionDispatcher* dispatcher;
+	btBroadphaseInterface* broadphase;
+	btSequentialImpulseConstraintSolver* solver;
+	btDiscreteDynamicsWorld* dynamicsWorld;
 };
 

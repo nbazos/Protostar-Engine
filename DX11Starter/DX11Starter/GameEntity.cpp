@@ -1,17 +1,65 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context)
+GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context, XMFLOAT3 position, XMFLOAT3 scale, XMFLOAT3 rotation, float isStatic)
 {
 	entityName = name;
 	entityMesh = mesh;
 	entityMaterial = material;
 	deviceContext = context;
+	this->isStatic = isStatic;
 
 	XMMATRIX W = XMMatrixIdentity();
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W));
-	position = XMFLOAT3(0, 0, 0);
-	scale = XMFLOAT3(1, 1, 1);
-	rotation = XMFLOAT3(0, 0, 0);
+	this->position = position;
+	this->scale = scale;
+	this->rotation = rotation;
+
+	// Physics
+
+	if (entityName == "Player")
+	{
+		//this->collShape = new btCapsuleShape(scale.x/2.0f, (float)scale.y);
+		this->collShape = new btSphereShape(scale.x / 2.0f);
+	}
+	else
+	{
+		this->collShape = new btBoxShape(btVector3(btScalar(scale.x / 2.0f), btScalar(scale.y / 2.0f), btScalar(scale.z / 2.0f)));
+	}
+
+	btTransform groundTransform;
+	groundTransform.setIdentity();
+	groundTransform.setOrigin(btVector3(position.x, position.y, position.z));
+
+	btScalar mass(isStatic);
+
+	//rigidbody is dynamic if and only if mass is non zero, otherwise static
+	bool isDynamic = (mass != 0.f);
+
+	btVector3 localInertia(0, 0, 0);
+	if (isDynamic)
+		collShape->calculateLocalInertia(mass, localInertia);
+
+	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, collShape, localInertia);
+	this->rBody = new btRigidBody(rbInfo);
+
+	// Constrainments
+	rBody->setLinearFactor(btVector3(1,1,0));
+	rBody->setAngularFactor(btVector3(0, 1, 1));
+
+	if (entityName == "Player")
+	{
+		rBody->setRollingFriction(1.0f);
+		rBody->setRestitution(1.0f);
+		rBody->hasContactResponse();
+	}
+	if (entityName == "Floor")
+	{
+		rBody->setRollingFriction(1.0f);
+		rBody->setRestitution(0.8f);
+		rBody->hasContactResponse();
+	}
 }
 
 GameEntity::~GameEntity()
@@ -49,8 +97,35 @@ void GameEntity::SetRotation(float pitch, float yaw, float roll)
 	rotation.z = roll * XM_PI / 180;
 }
 
+btRigidBody * GameEntity::GetRBody()
+{
+	return rBody;
+}
+
+btCollisionShape * GameEntity::GetCollShape()
+{
+	return collShape;
+}
+
+Mesh * GameEntity::GetMesh()
+{
+	return entityMesh;
+}
+
+Material * GameEntity::GetMaterial()
+{
+	return entityMaterial;
+}
+
+ID3D11DeviceContext * GameEntity::GetDeviceContext()
+{
+	return deviceContext;
+}
+
 void GameEntity::MoveAbsolute(float translationX, float translationY, float translationZ)
 {
+	// publish an event type to go to bullet physics and set position there to solve input issue?
+
 	position.x += translationX;
 	position.y += translationY;
 	position.z += translationZ;
