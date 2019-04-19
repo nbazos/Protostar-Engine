@@ -106,8 +106,8 @@ void Game::Init()
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
 	soundEngine.Init();
-	soundEngine.LoadSound("../../DX11Starter/audio/psycho.wav", true, true);
-	soundEngine.PlaySounds("../../DX11Starter/audio/psycho.wav", Vector3{ 5, 0, -30}, 1.0);
+	soundEngine.LoadSound("../../DX11Starter/audio/backgrnd.wav", true, true);
+	soundEngine.PlaySounds("../../DX11Starter/audio/backgrnd.wav", Vector3{ 5, 0, -30}, 1.0);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -199,7 +199,6 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	camera->CheckInput(0.001);
 	inputSystem.GetInput();
 	sceneManager.Update(deltaTime, totalTime);
 	soundEngine.Update();
