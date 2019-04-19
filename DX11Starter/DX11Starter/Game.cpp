@@ -46,7 +46,7 @@ Game::Game(HINSTANCE hInstance)
 Game::~Game()
 {
 	// Delete our simple shader objects, which
-// will clean up their own internal DirectX stuff
+	// will clean up their own internal DirectX stuff
 	delete vertexShader;
 	delete pixelShader;
 	delete camera;
@@ -192,7 +192,6 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	inputSystem.GetInput();
 	sceneManager.Update(deltaTime, totalTime);
 }
 
@@ -276,3 +275,15 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 	// Add any custom code here...
 }
 #pragma endregion
+
+void Game::OnKeyDown(WPARAM keyCode, LPARAM keyDetails)
+{
+	inputSystem.ProcessKeyDown(keyCode);
+}
+
+void Game::OnKeyUp(WPARAM keyCode, LPARAM keyDetails)
+{
+	inputSystem.ProcessKeyUp(keyCode);
+}
+
+

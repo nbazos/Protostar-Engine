@@ -10,9 +10,11 @@ public:
 	~Input();
 
 	void Init();
-	void GetInput();
+	void ProcessKeyDown(WPARAM keyCode);
+	void ProcessKeyUp(WPARAM keyCode);
 
 private:
 	bool cameraControlMode = false;
+	std::string vkToString(int vk);
 };
 
