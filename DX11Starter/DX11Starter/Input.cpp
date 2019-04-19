@@ -10,7 +10,25 @@ Input::~Input()
 
 void Input::Init()
 {
+
 }
+
+void Input::GetInput()
+{
+	/*if (GetKeyState('A'))
+	{
+		InputMoveLeft * ie = DBG_NEW InputMoveLeft();
+		eventBus->Publish(ie);
+		delete ie;
+	}
+	if (GetKeyState('D'))
+	{
+		InputMoveRight * ie = DBG_NEW InputMoveRight();
+		eventBus->Publish(ie);
+		delete ie;
+	}*/
+}
+
 
 void Input::ProcessKeyDown(WPARAM keyCode)
 {
@@ -29,13 +47,13 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 		eventBus->Publish(ie);
 		delete ie;
 	}
-	if (GetKeyState(VK_SPACE))
+	if (key == "VK_SPACE")
 	{
 		InputJump * ie = DBG_NEW InputJump();
 		eventBus->Publish(ie);
 		delete ie;
 	}
-	if (GetKeyState(VK_ADD))
+	if (key == "P")
 	{
 		InputQuickAddEntity * ie = DBG_NEW InputQuickAddEntity();
 		eventBus->Publish(ie);

@@ -110,25 +110,25 @@ void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(-2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-25.0f * deltaTime, 0.0f, 0.0f);
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-800.0f * deltaTime, 0.0f, 0.0f));
 }
 
 void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(25.0f * deltaTime, 0.0f, 0.0f));
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(800.0f * deltaTime, 0.0f, 0.0f));
 }
 
 void SceneManager::PlayerJump(InputJump * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 50.0f * deltaTime, 0.0f));
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 10000.0f * deltaTime, 0.0f));
 }
 
 void SceneManager::QuickAddEntity(InputQuickAddEntity * inputEvent)
 {
-	GameEntity temp = GameEntity(sceneEntities[4].entityName, sceneEntities[4].GetMesh(), sceneEntities[4].GetMaterial(), sceneEntities[4].GetDeviceContext(), XMFLOAT3(0, 1, 0), sceneEntities[4].GetScale(), sceneEntities[4].GetRotation(), 1.0f);
+	GameEntity temp = GameEntity(sceneEntities[0].entityName, sceneEntities[0].GetMesh(), sceneEntities[0].GetMaterial(), sceneEntities[0].GetDeviceContext(), XMFLOAT3(0, 1, 0), sceneEntities[0].GetScale(), sceneEntities[0].GetRotation(), 1.0f);
 	AddEntityToScene(temp);
 }

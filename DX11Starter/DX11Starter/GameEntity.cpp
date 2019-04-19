@@ -50,15 +50,16 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 
 	if (entityName == "Player")
 	{
-		rBody->setRollingFriction(1.0f);
-		rBody->setRestitution(1.0f);
-		rBody->hasContactResponse();
-	}
-	if (entityName == "Floor")
-	{
-		rBody->setRollingFriction(1.0f);
+		rBody->setAnisotropicFriction(btVector3(1.0f, 0.0f, 0.0f));
 		rBody->setRestitution(0.8f);
-		rBody->hasContactResponse();
+		//rBody->hasContactResponse();
+	}
+	if (entityName == "Floor" || entityName == "Platform1" || entityName == "Platform2")
+	{
+		rBody->setAnisotropicFriction(btVector3(1.0f, 0.0f, 0.0f));
+		//rBody->setRollingFriction(0.2f);
+		rBody->setRestitution(0.8f);
+		//rBody->hasContactResponse();
 	}
 }
 
