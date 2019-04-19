@@ -16,7 +16,15 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 
 	// Physics
 
-	this->collShape = new btBoxShape(btVector3(btScalar(scale.x/2.0f), btScalar(scale.y/2.0f), btScalar(scale.z/2.0f)));
+	if (entityName == "Player")
+	{
+		//this->collShape = new btCapsuleShape(scale.x/2.0f, (float)scale.y);
+		this->collShape = new btSphereShape(scale.x / 2.0f);
+	}
+	else
+	{
+		this->collShape = new btBoxShape(btVector3(btScalar(scale.x / 2.0f), btScalar(scale.y / 2.0f), btScalar(scale.z / 2.0f)));
+	}
 
 	btTransform groundTransform;
 	groundTransform.setIdentity();
@@ -36,10 +44,21 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, collShape, localInertia);
 	this->rBody = new btRigidBody(rbInfo);
 
+	// Constrainments
+	rBody->setLinearFactor(btVector3(1,1,0));
+	rBody->setAngularFactor(btVector3(0, 1, 1));
+
 	if (entityName == "Player")
 	{
-		rBody->setLinearFactor(btVector3(1,1,0));
-		rBody->setAngularFactor(btVector3(1, 0, 0));
+		rBody->setRollingFriction(1.0f);
+		rBody->setRestitution(1.0f);
+		rBody->hasContactResponse();
+	}
+	if (entityName == "Floor")
+	{
+		rBody->setRollingFriction(1.0f);
+		rBody->setRestitution(0.8f);
+		rBody->hasContactResponse();
 	}
 }
 

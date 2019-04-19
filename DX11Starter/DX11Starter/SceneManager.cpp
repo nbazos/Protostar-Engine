@@ -35,6 +35,7 @@ void SceneManager::PhysicsUpdate()
 
 		btTransform transform = body->getWorldTransform();
 		transform.setOrigin(btVector3(sceneEntities[i].GetPosition().x, sceneEntities[i].GetPosition().y, sceneEntities[i].GetPosition().z));
+		transform.setRotation(btQuaternion(sceneEntities[i].GetRotation().y, sceneEntities[i].GetRotation().z, sceneEntities[i].GetRotation().x));
 		body->setWorldTransform(transform);
 
 		dynamicsWorld->stepSimulation(deltaTime);
@@ -42,6 +43,8 @@ void SceneManager::PhysicsUpdate()
 		body->getMotionState()->getWorldTransform(transform);
 
 		sceneEntities[i].SetPosition(transform.getOrigin().getX(), transform.getOrigin().getY(), transform.getOrigin().getZ());
+		sceneEntities[i].SetRotation(transform.getRotation().getX(), transform.getRotation().getY(), transform.getRotation().getZ());
+		sceneEntities[i].SetWorldMatrix();
 	}
 }
 
@@ -128,6 +131,4 @@ void SceneManager::QuickAddEntity(InputQuickAddEntity * inputEvent)
 {
 	GameEntity temp = GameEntity(sceneEntities[4].entityName, sceneEntities[4].GetMesh(), sceneEntities[4].GetMaterial(), sceneEntities[4].GetDeviceContext(), XMFLOAT3(0, 1, 0), sceneEntities[4].GetScale(), sceneEntities[4].GetRotation(), 1.0f);
 	AddEntityToScene(temp);
-	int size = sceneEntities.size();
-	std::cout << "# of Physics Entities: " << size << std::endl;
 }

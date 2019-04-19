@@ -155,12 +155,12 @@ void Game::CreateMaterials()
 void Game::CreateBasicGeometry()
 {
 	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
-	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
+	Mesh* playerMesh = new Mesh("../../Assets/Models/sphere.obj", device);
 	meshes.push_back(cubeMesh);
-	meshes.push_back(coneMesh);
+	meshes.push_back(playerMesh);
 	
 	// Create GameEntities that utilize the meshes
-	GameEntity player = GameEntity("Player", coneMesh, material1, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
