@@ -29,6 +29,9 @@ public:
 	void OnMouseUp	 (WPARAM buttonState, int x, int y);
 	void OnMouseMove (WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta,   int x, int y);
+	void OnKeyDown(WPARAM keyCode, LPARAM keyDetails);
+	void OnKeyUp(WPARAM keyCode, LPARAM keyDetails);
+
 private:
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
@@ -56,5 +59,8 @@ private:
 	SceneManager sceneManager;
 	Render renderSystem;
 	// BulletPhysics physicsSystem;
+
+
+	std::string vkToString(int vk); // helper method to tell if and when keys are being
 };
 

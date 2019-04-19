@@ -110,7 +110,7 @@ void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(-2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-25.0f * deltaTime, 0.0f, 0.0f));
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-25.0f * deltaTime, 0.0f, 0.0f);
 }
 
 void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
