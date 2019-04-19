@@ -38,6 +38,8 @@ GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11
 
 GameEntity::~GameEntity()
 {
+	/*delete rBody;
+	delete collShape;*/
 }
 
 void GameEntity::SetWorldMatrix()
@@ -74,6 +76,11 @@ void GameEntity::SetRotation(float pitch, float yaw, float roll)
 btRigidBody * GameEntity::GetRBody()
 {
 	return rBody;
+}
+
+btCollisionShape * GameEntity::GetCollShape()
+{
+	return collShape;
 }
 
 void GameEntity::MoveAbsolute(float translationX, float translationY, float translationZ)

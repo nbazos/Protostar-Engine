@@ -23,6 +23,7 @@ public:
 	DirectX::XMFLOAT4X4 GetWorldMatrix() { return worldMatrix; };
 
 	btRigidBody * GetRBody();
+	btCollisionShape * GetCollShape();
 
 	void MoveAbsolute(float translationX, float translationY, float translationZ);
 	void Draw(XMFLOAT4X4 viewMat, XMFLOAT4X4 projectionMat);

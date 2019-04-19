@@ -1,6 +1,6 @@
 #include "Render.h"
 
-Render::Render(ID3D11DeviceContext*	ctx, ID3D11Device* d, float w, float h, ID3D11RenderTargetView* bBRTV, ID3D11DepthStencilView* dSV, IDXGISwapChain* sC, std::vector<GameEntity> * entities, Camera * cam)
+Render::Render(ID3D11DeviceContext*	ctx, ID3D11Device* d, unsigned int w, unsigned int h, ID3D11RenderTargetView* bBRTV, ID3D11DepthStencilView* dSV, IDXGISwapChain* sC, std::vector<GameEntity> * entities, Camera * cam)
 {
 	context = ctx;
 	device = d;

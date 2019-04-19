@@ -71,6 +71,8 @@ Game::~Game()
 
 	// Delete Meshes & GameEntities
 	for (auto& m : meshes) delete m;
+
+	sceneManager.ExitPhysics();
 }
 
 // --------------------------------------------------------

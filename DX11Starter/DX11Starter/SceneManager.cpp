@@ -43,7 +43,50 @@ void SceneManager::PhysicsUpdate()
 	}
 }
 
+void SceneManager::ExitPhysics()
+{
+	if (dynamicsWorld)
+	{
+		int i;
+		for (i = dynamicsWorld->getNumConstraints() - 1; i >= 0; i--)
+		{
+			dynamicsWorld->removeConstraint(dynamicsWorld->getConstraint(i));
+		}
+		for (i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+		{
+			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+			btRigidBody* body = btRigidBody::upcast(obj);
+			if (body && body->getMotionState())
+			{
+				delete body->getMotionState();
+			}
+			dynamicsWorld->removeCollisionObject(obj);
+			delete obj;
+		}
+	}
+	//delete collision shapes
+	for (int j = 0; j < sceneEntities.size(); j++)
+	{
+		btCollisionShape* shape = sceneEntities[j].GetCollShape();
+		delete shape;
+	}
+	// m_collisionShapes.clear();
 
+	delete dynamicsWorld;
+	dynamicsWorld = 0;
+
+	delete solver;
+	solver = 0;
+
+	delete broadphase;
+	broadphase = 0;
+
+	delete dispatcher;
+	dispatcher = 0;
+
+	delete collisionConfiguration;
+	collisionConfiguration = 0;
+}
 
 void SceneManager::AddEntityToScene(GameEntity entity)
 {
@@ -71,5 +114,3 @@ void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
 	sceneEntities[0].GetRBody()->activate();
 	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(25.0f * deltaTime, 0.0f, 0.0f));
 }
-
-
