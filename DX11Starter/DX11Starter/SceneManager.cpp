@@ -27,12 +27,12 @@ std::vector<GameEntity> * SceneManager::GetSceneEntities()
 
 void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 {
-	sceneEntities[0].MoveAbsolute(-2.0f * deltaTime, 0.0f, 0.0f);
+	sceneEntities[0].MoveAbsolute(-10.0f * deltaTime, 0.0f, 0.0f);
 }
 
 void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
 {
-	sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);
+	sceneEntities[0].MoveAbsolute(10.0f * deltaTime, 0.0f, 0.0f);
 }
 
 

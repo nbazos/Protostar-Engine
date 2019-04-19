@@ -504,9 +504,6 @@ void DXCore::CreateConsoleWindow(int bufferLines, int bufferColumns, int windowL
 }
 
 
-
-
-
 // --------------------------------------------------------
 // Handles messages that are sent to our window by the
 // operating system.  Ignoring these messages would cause
@@ -577,9 +574,12 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		return 0;
 	
 	case WM_KEYDOWN:
-		OnKeyDown(wParam);
+		OnKeyDown(wParam, lParam);
+		return 0;
+
 	case WM_KEYUP:
-		OnKeyUp(wParam);
+		OnKeyUp(wParam, lParam);
+		return 0;
 	}
 
 	// Let Windows handle any messages we're not touching
