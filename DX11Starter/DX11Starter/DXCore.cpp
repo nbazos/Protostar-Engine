@@ -575,6 +575,11 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_MOUSEWHEEL:
 		OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+	
+	case WM_KEYDOWN:
+		OnKeyDown(wParam);
+	case WM_KEYUP:
+		OnKeyUp(wParam);
 	}
 
 	// Let Windows handle any messages we're not touching

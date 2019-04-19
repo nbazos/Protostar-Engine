@@ -48,6 +48,8 @@ public:
 	virtual void OnMouseUp	 (WPARAM buttonState, int x, int y) { }
 	virtual void OnMouseMove (WPARAM buttonState, int x, int y) { }
 	virtual void OnMouseWheel(float wheelDelta,   int x, int y) { }
+	virtual void OnKeyDown(WPARAM keyCode) { }
+	virtual void OnKeyUp(WPARAM keyCode) { }
 	
 protected:
 	HINSTANCE	hInstance;		// The handle to the application
