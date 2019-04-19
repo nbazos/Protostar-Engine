@@ -5,6 +5,8 @@ void SceneManager::Init()
 	// Subscribe to the events that the SceneManager system will respond to
 	eventBus->Subscribe(this, &SceneManager::MovePlayerLeft);
 	eventBus->Subscribe(this, &SceneManager::MovePlayerRight);
+	eventBus->Subscribe(this, &SceneManager::PlayerJump);
+	eventBus->Subscribe(this, &SceneManager::QuickAddEntity);
 
 	// Physics
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -113,4 +115,19 @@ void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
 	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
 	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(25.0f * deltaTime, 0.0f, 0.0f));
+}
+
+void SceneManager::PlayerJump(InputJump * inputEvent)
+{
+	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
+	sceneEntities[0].GetRBody()->activate();
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 50.0f * deltaTime, 0.0f));
+}
+
+void SceneManager::QuickAddEntity(InputQuickAddEntity * inputEvent)
+{
+	GameEntity temp = GameEntity(sceneEntities[4].entityName, sceneEntities[4].GetMesh(), sceneEntities[4].GetMaterial(), sceneEntities[4].GetDeviceContext(), XMFLOAT3(0, 1, 0), sceneEntities[4].GetScale(), sceneEntities[4].GetRotation(), 1.0f);
+	AddEntityToScene(temp);
+	int size = sceneEntities.size();
+	std::cout << "# of Physics Entities: " << size << std::endl;
 }

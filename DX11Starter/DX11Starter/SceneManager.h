@@ -12,6 +12,7 @@ public:
 
 	void Init();
 	void Update(float deltaT, float totalT);
+
 	void PhysicsUpdate();
 	void ExitPhysics();
 
@@ -25,8 +26,13 @@ private:
 	float deltaTime;
 	float totalTime;
 
+	// Player Control
 	void MovePlayerLeft(InputMoveLeft * inputEvent);
 	void MovePlayerRight(InputMoveRight * inputEvent);
+	void PlayerJump(InputJump * inputEvent);
+
+	// Utility
+	void QuickAddEntity(InputQuickAddEntity * inputEvent);
 
 	// Physics
 	btDefaultCollisionConfiguration* collisionConfiguration;

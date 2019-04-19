@@ -72,6 +72,7 @@ Game::~Game()
 	// Delete Meshes & GameEntities
 	for (auto& m : meshes) delete m;
 
+	// Deallocate Physics System
 	sceneManager.ExitPhysics();
 }
 
@@ -159,12 +160,16 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(coneMesh);
 	
 	// Create GameEntities that utilize the meshes
-	GameEntity player = GameEntity("Player", coneMesh, material1, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(), 1.0f);
-	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(5.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(), 1.0f);
+	GameEntity player = GameEntity("Player", coneMesh, material1, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 
 	sceneManager.AddEntityToScene(player);
 	sceneManager.AddEntityToScene(floor);
+	sceneManager.AddEntityToScene(platform1);
+	sceneManager.AddEntityToScene(platform2);
 	sceneManager.AddEntityToScene(crate);
 }
 

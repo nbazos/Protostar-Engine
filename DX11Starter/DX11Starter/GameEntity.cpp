@@ -1,11 +1,12 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context, XMFLOAT3 position, XMFLOAT3 scale, XMFLOAT3 rotation, float isStatic)
+GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11DeviceContext* context, XMFLOAT3 position, XMFLOAT3 scale, XMFLOAT3 rotation, float isStatic)
 {
 	entityName = name;
 	entityMesh = mesh;
 	entityMaterial = material;
 	deviceContext = context;
+	this->isStatic = isStatic;
 
 	XMMATRIX W = XMMatrixIdentity();
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W));
@@ -34,12 +35,16 @@ GameEntity::GameEntity(const char * name, Mesh* mesh, Material* material, ID3D11
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, collShape, localInertia);
 	this->rBody = new btRigidBody(rbInfo);
+
+	if (entityName == "Player")
+	{
+		rBody->setLinearFactor(btVector3(1,1,0));
+		rBody->setAngularFactor(btVector3(1, 0, 0));
+	}
 }
 
 GameEntity::~GameEntity()
 {
-	/*delete rBody;
-	delete collShape;*/
 }
 
 void GameEntity::SetWorldMatrix()
@@ -81,6 +86,21 @@ btRigidBody * GameEntity::GetRBody()
 btCollisionShape * GameEntity::GetCollShape()
 {
 	return collShape;
+}
+
+Mesh * GameEntity::GetMesh()
+{
+	return entityMesh;
+}
+
+Material * GameEntity::GetMaterial()
+{
+	return entityMaterial;
+}
+
+ID3D11DeviceContext * GameEntity::GetDeviceContext()
+{
+	return deviceContext;
 }
 
 void GameEntity::MoveAbsolute(float translationX, float translationY, float translationZ)

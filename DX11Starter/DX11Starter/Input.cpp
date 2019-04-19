@@ -19,7 +19,6 @@ void Input::GetInput()
 		cameraControlMode = !cameraControlMode;
 		std::cout << cameraControlMode << std::endl;
 	}
-
 	if (GetKeyState('A') & 0x800 && !cameraControlMode)
 	{
 		InputMoveLeft * ie = DBG_NEW InputMoveLeft();
@@ -29,6 +28,18 @@ void Input::GetInput()
 	if (GetKeyState('D') & 0x800)
 	{
 		InputMoveRight * ie = DBG_NEW InputMoveRight();
+		eventBus->Publish(ie);
+		delete ie;
+	}
+	if (GetKeyState(VK_SPACE))
+	{
+		InputJump * ie = DBG_NEW InputJump();
+		eventBus->Publish(ie);
+		delete ie;
+	}
+	if (GetKeyState(VK_ADD))
+	{
+		InputQuickAddEntity * ie = DBG_NEW InputQuickAddEntity();
 		eventBus->Publish(ie);
 		delete ie;
 	}
