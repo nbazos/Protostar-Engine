@@ -78,7 +78,7 @@ public:
 	void LoadEvent(const string& eventName);
 	void LoadSound(const string & soundName, bool b_3d = true, bool b_Looping = false, bool b_Stream = false);
 	void UnloadSound(const string & soundName);
-	void Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity, const Vector3& forward, const Vector3& up);
+	void Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity);
 	int PlaySounds(const string& soundName, const Vector3& pos = Vector3{ 0, 0, 0 }, float volumedB = 0.0f);
 	void PlayEvent(const string& eventName);
 	void StopChannel(int channelId);

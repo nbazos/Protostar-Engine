@@ -67,9 +67,11 @@ void Sound::Init()
 // --------------------------------------------------------
 void Sound::Update()
 {
-	// Update the sound's position here
+	// Update audio position
+	// Multiple vector positioning
+	SetChannel3dPosition(soundImplemenet->m_Channels[soundImplemenet->m_nextChannelId], Vector3{0, 0, 0});
 
-	//Set3dListenerAndOrientation(Vector3(), Vector3(), Vector3(), Vector3());	<--- Will go HERE
+	Set3dListenerAndOrientation(Vector3(), Vector3());
 
 	soundImplemenet->Update();
 }
@@ -163,14 +165,12 @@ int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumed
 // --------------------------------------------------------
 // Updates the listeners position and orientation
 // --------------------------------------------------------
-void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity, const Vector3& forward, const Vector3& up) 
+void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity) 
 {
 	FMOD_VECTOR v3_position = VectorToFmod(pos);
 	FMOD_VECTOR v3_velocity = VectorToFmod(velocity);
-	FMOD_VECTOR v3_forward = VectorToFmod(forward);
-	FMOD_VECTOR v3_up = VectorToFmod(up);
 
-	soundImplemenet->m_system->set3DListenerAttributes(0, &v3_position, &v3_velocity, &v3_forward, &v3_up);
+	soundImplemenet->m_system->set3DListenerAttributes(0, &v3_position, &v3_velocity, 0, 0);
 }
 
 // --------------------------------------------------------
