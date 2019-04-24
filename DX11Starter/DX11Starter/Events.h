@@ -18,8 +18,10 @@ struct InputEvent : public Event
 	//~InputEvent() {}
 };
 
-struct InputMoveLeft : public Event {};
-struct InputMoveRight : public Event {};
+struct InputMoveLeft		: public Event {};
+struct InputMoveRight		: public Event {};
+struct InputJump			: public Event {};
+struct InputQuickAddEntity	: public Event {};
 struct PauseAudio : public Event {};
 struct PlayBackground : public Event {};
 struct WalkingSteps : public Event {};

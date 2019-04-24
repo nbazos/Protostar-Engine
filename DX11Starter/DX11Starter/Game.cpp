@@ -49,7 +49,7 @@ Game::Game(HINSTANCE hInstance)
 Game::~Game()
 {
 	// Delete our simple shader objects, which
-// will clean up their own internal DirectX stuff
+	// will clean up their own internal DirectX stuff
 	delete vertexShader;
 	delete pixelShader;
 	delete camera;
@@ -74,6 +74,9 @@ Game::~Game()
 
 	// Delete Meshes & GameEntities
 	for (auto& m : meshes) delete m;
+
+	// Deallocate Physics System
+	sceneManager.ExitPhysics();
 }
 
 // --------------------------------------------------------
@@ -106,8 +109,6 @@ void Game::Init()
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
 	soundEngine.Init();
-	soundEngine.LoadSound("../../DX11Starter/audio/backgrnd.wav", true, true);
-	soundEngine.PlaySounds("../../DX11Starter/audio/backgrnd.wav", Vector3{ 5, 0, -30}, 1.0);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -158,24 +159,22 @@ void Game::CreateMaterials()
 void Game::CreateBasicGeometry()
 {
 	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
-	Mesh* coneMesh = new Mesh("../../Assets/Models/cone.obj", device);
+	Mesh* playerMesh = new Mesh("../../Assets/Models/sphere.obj", device);
 	meshes.push_back(cubeMesh);
-	meshes.push_back(coneMesh);
-
+	meshes.push_back(playerMesh);
+	
 	// Create GameEntities that utilize the meshes
-	GameEntity cone = GameEntity("Player", coneMesh, material1, context);
-	GameEntity cube = GameEntity("Floor", cubeMesh, material1, context);
+	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 
-	// Set transformations
-	cube.SetScale(5.0f, 1.0f, 1.0f);
-	cube.SetPosition(0, -2.0f, 0);
-	cube.SetRotation(0.0f, 0.0f, 0.0f);
-
-	cone.SetScale(0.5f, 0.5f, 0.5f);
-	cone.SetPosition(2, -1, 0);
-
-	sceneManager.AddEntityToScene(cone);
-	sceneManager.AddEntityToScene(cube);
+	sceneManager.AddEntityToScene(player);
+	sceneManager.AddEntityToScene(floor);
+	sceneManager.AddEntityToScene(platform1);
+	sceneManager.AddEntityToScene(platform2);
+	sceneManager.AddEntityToScene(crate);
 }
 
 // --------------------------------------------------------
@@ -282,3 +281,15 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 	// Add any custom code here...
 }
 #pragma endregion
+
+void Game::OnKeyDown(WPARAM keyCode, LPARAM keyDetails)
+{
+	inputSystem.ProcessKeyDown(keyCode);
+}
+
+void Game::OnKeyUp(WPARAM keyCode, LPARAM keyDetails)
+{
+	inputSystem.ProcessKeyUp(keyCode);
+}
+
+

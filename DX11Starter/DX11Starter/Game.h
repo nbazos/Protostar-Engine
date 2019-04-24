@@ -5,7 +5,7 @@
 #include "SceneManager.h"
 #include "Render.h"
 #include "Sound.h"
-
+// #include "BulletPhysics.h"
 #include <WICTextureLoader.h>
 
 class Game : public DXCore
@@ -27,10 +27,12 @@ public:
 	void LoadShaders();
 
 	// Overridden mouse input helper methods
-	void OnMouseDown(WPARAM buttonState, int x, int y);
-	void OnMouseUp(WPARAM buttonState, int x, int y);
-	void OnMouseMove(WPARAM buttonState, int x, int y);
-	void OnMouseWheel(float wheelDelta, int x, int y);
+	void OnMouseDown (WPARAM buttonState, int x, int y);
+	void OnMouseUp	 (WPARAM buttonState, int x, int y);
+	void OnMouseMove (WPARAM buttonState, int x, int y);
+	void OnMouseWheel(float wheelDelta,   int x, int y);
+	void OnKeyDown(WPARAM keyCode, LPARAM keyDetails);
+	void OnKeyUp(WPARAM keyCode, LPARAM keyDetails);
 
 private:
 	// Keeps track of the old mouse position.  Useful for 
@@ -59,4 +61,7 @@ private:
 	SceneManager sceneManager;
 	Render renderSystem;
 	Sound soundEngine;
+	// BulletPhysics physicsSystem;
+
+	std::string vkToString(int vk); // helper method to tell if and when keys are being
 };
