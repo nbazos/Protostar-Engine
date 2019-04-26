@@ -69,9 +69,9 @@ void Sound::Update()
 {
 	// Update audio position
 	// Multiple vector positioning
-	SetChannel3dPosition(soundImplemenet->m_Channels[soundImplemenet->m_nextChannelId], Vector3{0, 0, 0});
+	//SetChannel3dPosition(soundImplemenet->m_Channels[soundImplemenet->m_nextChannelId], Vector3{0, 0, 0});
 
-	Set3dListenerAndOrientation(Vector3(), Vector3());
+	//Set3dListenerAndOrientation(Vector3(), Vector3());
 
 	soundImplemenet->Update();
 }

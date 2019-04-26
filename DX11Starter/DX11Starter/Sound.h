@@ -69,6 +69,8 @@ public:
 	Sound(EventBus * eventBusPtr) : System(eventBusPtr) {};
 	~Sound() {};
 
+	bool showDemo = true;
+
 	static void Init();
 	static void Update();
 	static void Shutdown();
