@@ -2,6 +2,8 @@
 
 #include <WindowsX.h>
 #include <sstream>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
 
 // Define the static instance variable so our OS-level 
 // message handling function below can talk to our object
@@ -192,6 +194,10 @@ HRESULT DXCore::InitDirectX()
 	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapDesc.Windowed = true;
 
+	// Application init: create a dear imgui context, setup some options, load fonts
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+
 	// Result variable for below function calls
 	HRESULT hr = S_OK;
 
@@ -253,6 +259,8 @@ HRESULT DXCore::InitDirectX()
 	// uses their underlying textures
 	context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
 
+	ImGui_ImplDX11_Init(device, context);
+
 	// Lastly, set up a viewport so we render into
 	// to correct portion of the window
 	D3D11_VIEWPORT viewport = {};
@@ -262,7 +270,7 @@ HRESULT DXCore::InitDirectX()
 	viewport.Height		= (float)height;
 	viewport.MinDepth	= 0.0f;
 	viewport.MaxDepth	= 1.0f;
-	context->RSSetViewports(1, &viewport);
+	context->RSSetViewports(1, &viewport);	
 
 	// Return the "everything is ok" HRESULT value
 	return S_OK;
@@ -357,6 +365,17 @@ HRESULT DXCore::Run()
 	MSG msg = {};
 	while (msg.message != WM_QUIT)
 	{
+		// Feed inputs to dear imgui, start new frame
+		ImGui_ImplDX11_NewFrame();
+		ImGui::NewFrame();
+
+		// Any application code here
+		ImGui::Text("Hello, world!");
+
+		// Render dear imgui into screen
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 		// Determine if there is a message waiting
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -390,6 +409,9 @@ HRESULT DXCore::Run()
 // --------------------------------------------------------
 void DXCore::Quit()
 {
+	// Shutdown
+	ImGui_ImplDX11_Shutdown();
+	ImGui::DestroyContext();
 	PostMessage(this->hWnd, WM_CLOSE, NULL, NULL);
 }
 
