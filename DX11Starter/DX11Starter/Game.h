@@ -5,7 +5,6 @@
 #include "SceneManager.h"
 #include "Render.h"
 // #include "BulletPhysics.h"
-#include <WICTextureLoader.h>
 
 class Game : public DXCore {
 public:

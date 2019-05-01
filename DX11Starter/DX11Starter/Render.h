@@ -7,13 +7,19 @@
 #include "GameEntity.h"
 #include "Camera.h"
 #include <DirectXMath.h>
+#include "System.h"
+#include "Events.h"
+#include "SpriteBatch.h"
 
-
-class Render 
+class Render /// SLATE /*: public System*/
 {
 public:
 	Render() {};
-	Render(ID3D11DeviceContext*	context, ID3D11Device* device, unsigned int width, unsigned int height, ID3D11RenderTargetView* backBufferRTV, ID3D11DepthStencilView* depthStencilView, IDXGISwapChain* swapChain, std::vector<GameEntity> * entities, Camera * cam);
+	Render(/*EventBus * eventBusPtr,*/ ID3D11DeviceContext*	context, ID3D11Device* device, unsigned int width, unsigned int height,
+		ID3D11RenderTargetView* backBufferRTV, ID3D11DepthStencilView* depthStencilView, IDXGISwapChain* swapChain,
+		std::vector<GameEntity> * entities, Camera * cam); /*: System(eventBusPtr), context{ context },
+		device{ device }, width{ width }, height{ height }, backBufferRTV{ backBufferRTV }, depthStencilView{ depthStencilView },
+		swapChain{ swapChain }, gameEntities{ entities }, camera{ cam } {};*/
 	~Render() {};
 
 	void Init();
@@ -32,5 +38,13 @@ private:
 
 	Camera* camera;
 	std::vector<GameEntity>* gameEntities;
+
+	/// SLATE
+	//bool slateDisplaying;
+	//void ShowSlate(InputSlate * inputEvent);
+
+	//ID3D11ShaderResourceView* slateSRV;
+	//std::unique_ptr<SpriteBatch> spriteBatch;
+
 };
 

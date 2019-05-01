@@ -21,3 +21,5 @@ struct InputMoveLeft		: public Event {};
 struct InputMoveRight		: public Event {};
 struct InputJump			: public Event {};
 struct InputQuickAddEntity	: public Event {};
+/// SLATE
+//struct InputSlate : public Event {};

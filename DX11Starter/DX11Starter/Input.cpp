@@ -59,6 +59,13 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 		eventBus->Publish(ie);
 		delete ie;
 	}
+	/// SLATE 
+	/*if (key == "VK_SHIFT")
+	{
+		InputSlate * ie = DBG_NEW InputSlate();
+		eventBus->Publish(ie);
+		delete ie;
+	}*/
 }
 
 void Input::ProcessKeyUp(WPARAM keyCode)

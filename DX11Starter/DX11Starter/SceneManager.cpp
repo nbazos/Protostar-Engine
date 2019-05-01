@@ -111,6 +111,7 @@ void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 	/*sceneEntities[0].MoveAbsolute(-2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
 	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-800.0f * deltaTime, 0.0f, 0.0f));
+	//sceneEntities[0].GetRBody()->setAngularVelocity();
 }
 
 void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
@@ -124,7 +125,7 @@ void SceneManager::PlayerJump(InputJump * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 10000.0f * deltaTime, 0.0f));
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 5000.0f * deltaTime, 0.0f));
 }
 
 void SceneManager::QuickAddEntity(InputQuickAddEntity * inputEvent)

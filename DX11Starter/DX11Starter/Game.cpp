@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
+#include <WICTextureLoader.h>
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -102,7 +103,7 @@ void Game::Init()
 	sceneManager = SceneManager(&eventBus, camera);
 	sceneManager.Init();
 	CreateBasicGeometry();
-	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
+	renderSystem = Render(/*&eventBus,*/ context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
 	renderSystem.Init();
 	
 
@@ -161,7 +162,7 @@ void Game::CreateBasicGeometry()
 	
 	// Create GameEntities that utilize the meshes
 	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
-	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
+	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(15.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
@@ -266,6 +267,14 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;
+
+	/// SLATE
+	//// Get Pixel Color at Mouse Position
+	//HDC hDC = GetDC(NULL);
+	//COLORREF color = GetPixel(hDC, x, y);
+	//ReleaseDC(GetDesktopWindow(), hDC);
+
+	//GetRValue(color); // GetBValue(), GetGValue()...
 }
 
 // --------------------------------------------------------
