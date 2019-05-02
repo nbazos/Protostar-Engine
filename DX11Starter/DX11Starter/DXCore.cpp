@@ -2,8 +2,6 @@
 
 #include <WindowsX.h>
 #include <sstream>
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx11.h"
 
 // Define the static instance variable so our OS-level 
 // message handling function below can talk to our object
@@ -194,10 +192,6 @@ HRESULT DXCore::InitDirectX()
 	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapDesc.Windowed = true;
 
-	// Application init: create a dear imgui context, setup some options, load fonts
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-
 	// Result variable for below function calls
 	HRESULT hr = S_OK;
 
@@ -216,6 +210,14 @@ HRESULT DXCore::InitDirectX()
 		&dxFeatureLevel,			// This will hold the actual feature level the app will use
 		&context);					// Pointer to our Device Context pointer
 	if (FAILED(hr)) return hr;
+
+	// Setup ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX11_Init(this->device, this->context);
+	ImGui::StyleColorsDark();
 
 	// The above function created the back buffer render target
 	// for us, but we need a reference to it
@@ -258,8 +260,6 @@ HRESULT DXCore::InitDirectX()
 	// Bind the views to the pipeline, so rendering properly 
 	// uses their underlying textures
 	context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
-
-	ImGui_ImplDX11_Init(device, context);
 
 	// Lastly, set up a viewport so we render into
 	// to correct portion of the window
@@ -365,17 +365,6 @@ HRESULT DXCore::Run()
 	MSG msg = {};
 	while (msg.message != WM_QUIT)
 	{
-		// Feed inputs to dear imgui, start new frame
-		ImGui_ImplDX11_NewFrame();
-		ImGui::NewFrame();
-
-		// Any application code here
-		ImGui::Text("Hello, world!");
-
-		// Render dear imgui into screen
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
 		// Determine if there is a message waiting
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -409,8 +398,8 @@ HRESULT DXCore::Run()
 // --------------------------------------------------------
 void DXCore::Quit()
 {
-	// Shutdown
 	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 	PostMessage(this->hWnd, WM_CLOSE, NULL, NULL);
 }
@@ -532,8 +521,12 @@ void DXCore::CreateConsoleWindow(int bufferLines, int bufferColumns, int windowL
 // our program to hang and Windows would think it was
 // unresponsive.
 // --------------------------------------------------------
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
 	// Check the incoming message and handle any we care about
 	switch (uMsg)
 	{

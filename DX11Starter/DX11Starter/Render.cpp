@@ -38,6 +38,12 @@ void Render::Draw(float deltaTime, float totalTime)
 		(*gameEntities)[i].Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix());
 	}
 
+	// Assemble Together Draw Data
+	ImGui::Render();
+
+	// Render Draw Data
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)

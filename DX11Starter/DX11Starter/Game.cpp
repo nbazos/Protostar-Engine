@@ -217,6 +217,45 @@ void Game::Draw(float deltaTime, float totalTime)
 		&dirLight2,
 		sizeof(DirectionalLight));
 
+	static int counter = 0;
+
+	// Start the Dear ImGui frame
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	// Create ImGui Test Window
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			ImGui::MenuItem("Test Menu", NULL, false, false);
+			if (ImGui::MenuItem("Open", "Ctrl+O"))
+			{
+				OPENFILENAME ofn;
+
+				char file_name[200];
+
+				ZeroMemory(&ofn, sizeof(OPENFILENAME));
+
+				ofn.lStructSize = sizeof(OPENFILENAME);
+				ofn.hwndOwner = hWnd;
+				ofn.lpstrFile = file_name;
+				ofn.lpstrFile[0] = '\0';
+				ofn.nMaxFile = 200;
+				ofn.lpstrFilter = "All files\0*.*\0Wav Files\0*.wav\0MP3 Files\0*.mp3\0";
+				ofn.nFilterIndex = 1;
+
+				GetOpenFileName(&ofn);
+
+				//MessageBox(NULL, ofn.lpstrFile,"", MB_OK);
+				soundEngine.PlaySounds(ofn.lpstrFile, Vector3{ 0, 0, 0 }, 1.0);
+			}			
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
 	renderSystem.Draw(deltaTime, totalTime);
 }
 
