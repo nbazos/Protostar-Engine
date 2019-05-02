@@ -75,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)fmod\lib;..\Libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -87,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)fmod\lib;..\Libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -101,7 +101,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -117,7 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\fmod;..\bullet3-2.88\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

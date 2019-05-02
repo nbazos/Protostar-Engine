@@ -4,8 +4,7 @@
 #include "GameEntity.h"
 #include "Camera.h"
 
-class SceneManager : public System 
-{
+class SceneManager : public System {
 public:
 	SceneManager() {};
 	SceneManager(EventBus * eventBusPtr, Camera * camera) : System(eventBusPtr), sceneCamera{ camera } {};

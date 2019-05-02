@@ -3,8 +3,6 @@
 // --------------------------------------------------------
 // Prevents multiple definitions of objects in the header
 // --------------------------------------------------------
-#ifndef _SOUND_ENGINE_H
-#define _SOUND_ENGINE_H
 
 #define DOPPLER_SCALE         1.0
 #define DISTANCE_FACTOR       1.0
@@ -88,5 +86,3 @@ public:
 	float VolumeTodB(float volume);
 	FMOD_VECTOR VectorToFmod(const Vector3& pos);
 };
-
-#endif

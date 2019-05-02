@@ -128,7 +128,7 @@ int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumed
 		// If it's not found, then it's loaded into the map
 		LoadSound(soundName);
 		t_FoundIt = soundImplemenet->m_Sounds.find(soundName);
-		
+
 		// If it's still not found, then we don't load
 		if (t_FoundIt == soundImplemenet->m_Sounds.end())
 		{
@@ -165,7 +165,7 @@ int Sound::PlaySounds(const string& soundName, const Vector3& pos, float volumed
 // --------------------------------------------------------
 // Updates the listeners position and orientation
 // --------------------------------------------------------
-void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity) 
+void Sound::Set3dListenerAndOrientation(const Vector3& pos, const Vector3& velocity)
 {
 	FMOD_VECTOR v3_position = VectorToFmod(pos);
 	FMOD_VECTOR v3_velocity = VectorToFmod(velocity);
@@ -233,7 +233,7 @@ void Sound::StopChannel(int channelId)
 // --------------------------------------------------------
 void Sound::StopAllChannels()
 {
-	/*for (int i = 0; i < soundImplemenet->m_Channels.count; i++) 
+	/*for (int i = 0; i < soundImplemenet->m_Channels.count; i++)
 	{
 		auto t_FoundIt = soundImplemenet->m_Channels.find(i);
 		if (t_FoundIt == soundImplemenet->m_Channels.end())

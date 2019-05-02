@@ -29,16 +29,14 @@ Game::Game(HINSTANCE hInstance)
 	brickSRV = 0;
 	grassSRV = 0;
 	sampler = 0;
-	
-
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
-	CreateConsoleWindow(500, 120, 32, 120);	
+	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
-	
+
 #endif
-	
+
 }
 
 // --------------------------------------------------------
@@ -94,7 +92,7 @@ void Game::Init()
 	// Create camera & initial projection matrix
 	camera = new Camera(0.0f, 0.0f, -10.0f);
 	camera->UpdateProjectionMatrix((float)width / height);
-	
+
 	// Define directional lights for the scene
 	dirLight1 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f) };
 	dirLight2 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
@@ -162,7 +160,7 @@ void Game::CreateBasicGeometry()
 	Mesh* playerMesh = new Mesh("../../Assets/Models/sphere.obj", device);
 	meshes.push_back(cubeMesh);
 	meshes.push_back(playerMesh);
-	
+
 	// Create GameEntities that utilize the meshes
 	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
@@ -291,5 +289,3 @@ void Game::OnKeyUp(WPARAM keyCode, LPARAM keyDetails)
 {
 	inputSystem.ProcessKeyUp(keyCode);
 }
-
-

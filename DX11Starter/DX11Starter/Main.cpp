@@ -14,7 +14,7 @@ int WINAPI WinMain(
 	// Enable memory leak detection as a quick and dirty
 	// way of determining if we forgot to clean something up
 	//  - You may want to use something more advanced, like Visual Leak Detector
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
 	// Ensure "Current Directory" (relative path) is always the .exe's folder
@@ -52,12 +52,12 @@ int WINAPI WinMain(
 	// Attempt to create the window for our program, and
 	// exit early if something failed
 	hr = dxGame.InitWindow();
-	if (FAILED(hr)) return hr;
+	if(FAILED(hr)) return hr;
 
 	// Attempt to initialize DirectX, and exit
 	// early if something failed
 	hr = dxGame.InitDirectX();
-	if (FAILED(hr)) return hr;
+	if(FAILED(hr)) return hr;
 
 	// Begin the message and game loop, and then return
 	// whatever we get back once the game loop is over

@@ -46,8 +46,7 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 		InputMoveRight * ie = DBG_NEW InputMoveRight();
 		eventBus->Publish(ie);
 		delete ie;
-	}
-  
+	}  
 	if (key == "VK_SPACE")
 	{
 		InputJump * ie = DBG_NEW InputJump();
