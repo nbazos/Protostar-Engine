@@ -2,6 +2,7 @@
 
 #include <WindowsX.h>
 #include <sstream>
+#include <thread>
 
 // Define the static instance variable so our OS-level 
 // message handling function below can talk to our object
@@ -574,11 +575,26 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		return 0;
 	
 	case WM_KEYDOWN:
-		OnKeyDown(wParam, lParam);
+		//std::this_thread::sleep_for(std::chrono::milliseconds(100)); // sleep the thread for given milliseconds
+		if (wParam == lastKeyPressed)
+		{
+			return 0;
+		}
+
+		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS)
+		{
+			OnKeyDown(wParam, lParam);
+			lastKeyPressed = wParam;
+		}
+
 		return 0;
 
 	case WM_KEYUP:
-		OnKeyUp(wParam, lParam);
+		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS)
+		{
+			OnKeyUp(wParam, lParam);
+			lastKeyPressed = 0;
+		}
 		return 0;
 	}
 

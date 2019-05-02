@@ -13,7 +13,7 @@ public:
 	void Init();
 	void Update(float deltaT, float totalT);
 
-	void PhysicsUpdate();
+	void PhysicsStep();
 	void ExitPhysics();
 
 	void AddEntityToScene(GameEntity entity);
@@ -30,9 +30,12 @@ private:
 	void MovePlayerLeft(InputMoveLeft * inputEvent);
 	void MovePlayerRight(InputMoveRight * inputEvent);
 	void PlayerJump(InputJump * inputEvent);
+	int jumpCount;
+	bool doubleJumpControl;
 
 	// Utility
 	void QuickAddEntity(InputQuickAddEntity * inputEvent);
+	void CameraFollow();
 
 	// Physics
 	btDefaultCollisionConfiguration* collisionConfiguration;
@@ -40,5 +43,6 @@ private:
 	btBroadphaseInterface* broadphase;
 	btSequentialImpulseConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamicsWorld;
+	void CheckCollisionWithFloor();
 };
 

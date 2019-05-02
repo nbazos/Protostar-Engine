@@ -89,7 +89,7 @@ void Game::Init()
 	CreateMaterials();
 
 	// Create camera & initial projection matrix
-	camera = new Camera(0.0f, 0.0f, -10.0f);
+	camera = new Camera(0.0f, 0.0f, -15.0f);
 	camera->UpdateProjectionMatrix((float)width / height);
 	
 	// Define directional lights for the scene
@@ -160,7 +160,7 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(playerMesh);
 	
 	// Create GameEntities that utilize the meshes
-	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(2, -1, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(1, 3, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
 	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
@@ -282,6 +282,7 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 void Game::OnKeyDown(WPARAM keyCode, LPARAM keyDetails)
 {
 	inputSystem.ProcessKeyDown(keyCode);
+	//std::cout << (keyDetails & 0xFF) << std::endl; // gets the repeat count from bits 0-15 in lParam
 }
 
 void Game::OnKeyUp(WPARAM keyCode, LPARAM keyDetails)
