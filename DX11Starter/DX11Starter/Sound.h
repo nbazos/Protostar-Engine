@@ -11,7 +11,6 @@
 #define ROLLOFF_SCALE         0.5
 
 #include "System.h"
-#include "inc/fmod_studio.hpp"
 #include "inc/fmod.hpp"
 #include <string>
 #include <map>
@@ -43,20 +42,16 @@ struct SoundImplement
 
 	void Update();
 
-	FMOD::Studio::System* m_soundSystem;
+	FMOD::System* m_soundSystem;
 	FMOD::System* m_system;
 
 	int m_nextChannelId;
 
 	typedef map<string, FMOD::Sound*> SoundMap;
 	typedef map<int, FMOD::Channel*> ChannelMap;
-	typedef map<string, FMOD::Studio::EventInstance*> EventMap;
-	typedef map<string, FMOD::Studio::Bank*> BankMap;
 
 	SoundMap m_Sounds;
 	ChannelMap m_Channels;
-	EventMap m_Events;
-	BankMap m_Banks;	
 };
 
 // --------------------------------------------------------
@@ -74,7 +69,6 @@ public:
 	static void Shutdown();
 	static int ErrorCheck(FMOD_RESULT result);
 
-	void LoadBank(const string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags);
 	void LoadEvent(const string& eventName);
 	void LoadSound(const string & soundName, bool b_3d = true, bool b_Looping = false, bool b_Stream = false);
 	void UnloadSound(const string & soundName);

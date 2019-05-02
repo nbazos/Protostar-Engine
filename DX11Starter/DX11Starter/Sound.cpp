@@ -10,7 +10,7 @@ SoundImplement::SoundImplement()
 	Sound::ErrorCheck(FMOD::System_Create(&m_system));
 
 	// Should we want to mix and update audio in FMOD Studio
-	Sound::ErrorCheck(m_system->init(32, FMOD_STUDIO_INIT_LIVEUPDATE, NULL));
+	Sound::ErrorCheck(m_system->init(32, FMOD_3D, NULL));
 }
 
 // --------------------------------------------------------
@@ -69,9 +69,9 @@ void Sound::Update()
 {
 	// Update audio position
 	// Multiple vector positioning
-	SetChannel3dPosition(soundImplemenet->m_Channels[soundImplemenet->m_nextChannelId], Vector3{0, 0, 0});
+	//SetChannel3dPosition(soundImplemenet->m_Channels[soundImplemenet->m_nextChannelId], Vector3{0, 0, 0});
 
-	Set3dListenerAndOrientation(Vector3(), Vector3());
+	//Set3dListenerAndOrientation(Vector3(), Vector3());
 
 	soundImplemenet->Update();
 }
@@ -199,84 +199,6 @@ void Sound::SetChannelVolume(int channelId, float volumedB)
 }
 
 // --------------------------------------------------------
-// Stores all the sounds and info for each event
-// --------------------------------------------------------
-void Sound::LoadBank(const string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags)
-{
-	// Grab the filename
-	auto t_FoundIt = soundImplemenet->m_Banks.find(bankName);
-	if (t_FoundIt != soundImplemenet->m_Banks.end())
-		return;
-
-	// Store it into the Bank map
-	FMOD::Studio::Bank* pBank;
-	Sound::ErrorCheck(soundImplemenet->m_soundSystem->loadBankFile(bankName.c_str(), flags, &pBank));
-	if (pBank)
-	{
-		soundImplemenet->m_Banks[bankName] = pBank;
-	}
-}
-
-// --------------------------------------------------------
-// Loads events separately into the map
-// --------------------------------------------------------
-void Sound::LoadEvent(const string& eventName)
-{
-	// Grab the filename
-	auto tFoundit = soundImplemenet->m_Events.find(eventName);
-	if (tFoundit != soundImplemenet->m_Events.end())
-		return;
-
-	// Load the description of the event
-	FMOD::Studio::EventDescription* pEventDescription = NULL;
-	Sound::ErrorCheck(soundImplemenet->m_soundSystem->getEvent(eventName.c_str(), &pEventDescription));
-
-	// Create the instance of the event
-	if (pEventDescription)
-	{
-		FMOD::Studio::EventInstance* pEventInstance = NULL;
-		Sound::ErrorCheck(pEventDescription->createInstance(&pEventInstance));
-		if (pEventInstance)
-		{
-			soundImplemenet->m_Events[eventName] = pEventInstance;
-		}
-	}
-}
-
-// --------------------------------------------------------
-// Plays the event coming from the event map
-// --------------------------------------------------------
-void Sound::PlayEvent(const string &eventName)
-{
-	// Checks if the event is there
-	auto tFoundit = soundImplemenet->m_Events.find(eventName);
-	if (tFoundit == soundImplemenet->m_Events.end())
-	{
-		// If it's not there, load it
-		LoadEvent(eventName);
-		tFoundit = soundImplemenet->m_Events.find(eventName);
-		if (tFoundit == soundImplemenet->m_Events.end())
-			return;
-	}
-	tFoundit->second->start();
-}
-
-// --------------------------------------------------------
-// Stops the event from playing
-// --------------------------------------------------------
-void Sound::StopEvent(const string &eventName, bool bImmediate)
-{
-	auto t_FoundIt = soundImplemenet->m_Events.find(eventName);
-	if (t_FoundIt == soundImplemenet->m_Events.end())
-		return;
-
-	// Determines if we want to stop it immediately or fade it out
-	FMOD_STUDIO_STOP_MODE eMode;
-	eMode = bImmediate ? FMOD_STUDIO_STOP_IMMEDIATE : FMOD_STUDIO_STOP_ALLOWFADEOUT;
-	Sound::ErrorCheck(t_FoundIt->second->stop(eMode));
-}
-
-// --------------------------------------------------------
 // Checks if a channel is playing
 // --------------------------------------------------------
 bool Sound::IsPlaying(int channelId) const
@@ -292,52 +214,6 @@ bool Sound::IsPlaying(int channelId) const
 	//	return true;
 	//}
 	return false;
-}
-
-// --------------------------------------------------------
-// Checks if the event is playing
-// --------------------------------------------------------
-bool Sound::IsEventPlaying(const string &eventName) const
-{
-	auto t_FoundIt = soundImplemenet->m_Events.find(eventName);
-	if (t_FoundIt == soundImplemenet->m_Events.end())
-		return false;
-
-	// If it is playing, return its state to such
-	FMOD_STUDIO_PLAYBACK_STATE* state = NULL;
-	if (t_FoundIt->second->getPlaybackState(state) == FMOD_STUDIO_PLAYBACK_PLAYING) 
-	{
-		return true;
-	}
-	return false;
-}
-
-// --------------------------------------------------------
-// Returns the event parameter on the proper event
-// --------------------------------------------------------
-void Sound::GetEventParameter(const string &eventName, const string &parameterName, float* parameter)
-{
-	auto t_FoundIt = soundImplemenet->m_Events.find(eventName);
-	if (t_FoundIt == soundImplemenet->m_Events.end())
-		return;
-
-	FMOD::Studio::ParameterInstance* pParameter = NULL;
-	Sound::ErrorCheck(t_FoundIt->second->getParameter(parameterName.c_str(), &pParameter));
-	Sound::ErrorCheck(pParameter->getValue(parameter));
-}
-
-// --------------------------------------------------------
-// Set up the event parameter dynamically
-// --------------------------------------------------------
-void Sound::SetEventParameter(const string &eventName, const string &parameterName, float value)
-{
-	auto t_FoundIt = soundImplemenet->m_Events.find(eventName);
-	if (t_FoundIt == soundImplemenet->m_Events.end())
-		return;
-
-	FMOD::Studio::ParameterInstance* pParameter = NULL;
-	Sound::ErrorCheck(t_FoundIt->second->getParameter(parameterName.c_str(), &pParameter));
-	Sound::ErrorCheck(pParameter->setValue(value));
 }
 
 // --------------------------------------------------------
