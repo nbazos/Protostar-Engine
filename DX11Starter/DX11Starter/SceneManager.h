@@ -24,7 +24,8 @@ private: // Members
 	float deltaTime;
 	float totalTime;
 	int jumpCount;
-	bool doubleJumpControl;	
+	bool doubleJumpControl;
+	bool reverseGravity;
 	
 	// Physics
 	btDefaultCollisionConfiguration* collisionConfiguration;
@@ -40,7 +41,8 @@ private: // Methods
 	void MovePlayerLeft(InputMoveLeft * inputEvent);
 	void MovePlayerRight(InputMoveRight * inputEvent);
 	void PlayerJump(InputJump * inputEvent);
-	
+	void PlayerReverseGravity(InputReverseGravity * inputEvent);
+  
 	void CameraFollow();
 	void QuickAddEntity(InputQuickAddEntity * inputEvent);
 	void CheckCollisionWithFloor();

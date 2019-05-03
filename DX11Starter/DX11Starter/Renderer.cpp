@@ -165,18 +165,28 @@ void Renderer::CreateBasicGeometry()
 	meshes.push_back(cubeMesh);
 	meshes.push_back(playerMesh);
 
-	// Create GameEntities that utilize the meshes
-	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(1, 3, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
-	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	// Add player to the scene
+	sceneManager->AddEntityToScene(GameEntity("Player", playerMesh, material2, context, XMFLOAT3(1, 3, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f));
 
-	sceneManager->AddEntityToScene(player);
-	sceneManager->AddEntityToScene(floor);
-	sceneManager->AddEntityToScene(platform1);
-	sceneManager->AddEntityToScene(platform2);
-	sceneManager->AddEntityToScene(crate);
+	CreateBasicLevel();
+}
+
+void Renderer::CreateBasicLevel()
+{
+	sceneManager->AddEntityToScene(GameEntity("Floor", meshes[0], material1, context, XMFLOAT3(15, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
+	sceneManager->AddEntityToScene(GameEntity("Floor", meshes[0], material1, context, XMFLOAT3(35, 8.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
+	sceneManager->AddEntityToScene(GameEntity("Floor", meshes[0], material1, context, XMFLOAT3(52, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
+	sceneManager->AddEntityToScene(GameEntity("Platform", meshes[0], material1, context, XMFLOAT3(20, 2.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
+	sceneManager->AddEntityToScene(GameEntity("Platform", meshes[0], material1, context, XMFLOAT3(27, 5.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
+	sceneManager->AddEntityToScene(GameEntity("Bouncy Platform", meshes[0], material1, context, XMFLOAT3(42, -2.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 9.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 10.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 11.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 12.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 13.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 14.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Crate", meshes[0], material1, context, XMFLOAT3(35, 15.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 10.0f));
+	sceneManager->AddEntityToScene(GameEntity("Floor", meshes[0], material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f));
 }
 
 void Renderer::Draw(float deltaTime, float totalTime)

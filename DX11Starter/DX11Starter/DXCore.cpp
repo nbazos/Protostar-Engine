@@ -581,7 +581,7 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			return 0;
 		}
 
-		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS)
+		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS || wParam == VK_SHIFT)
 		{
 			OnKeyDown(wParam, lParam);
 			lastKeyPressed = (int)wParam;
@@ -590,7 +590,7 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		return 0;
 
 	case WM_KEYUP:
-		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS)
+		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS || wParam == VK_SHIFT)
 		{
 			OnKeyUp(wParam, lParam);
 			lastKeyPressed = 0;
