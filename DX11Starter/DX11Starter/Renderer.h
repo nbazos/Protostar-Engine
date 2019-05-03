@@ -69,6 +69,7 @@ private: // Methods
 	void LoadShaders();
 	void CreateMaterials();
 	void CreateBasicGeometry();
+	void CreateBasicLevel();
 	void DrawSky();
 };
 

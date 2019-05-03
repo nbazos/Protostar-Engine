@@ -13,7 +13,7 @@ void Input::Init()
 
 }
 
-void Input::GetInput()
+void Input::Update()
 {
 	if (GetKeyState('A') & 0x8000)
 	{
@@ -45,6 +45,12 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 	if (keyCode == VK_OEM_PLUS)
 	{
 		InputQuickAddEntity * ie = DBG_NEW InputQuickAddEntity();
+		eventBus->Publish(ie);
+		delete ie;
+	}
+	if (keyCode == VK_SHIFT)
+	{
+		InputReverseGravity * ie = DBG_NEW InputReverseGravity();
 		eventBus->Publish(ie);
 		delete ie;
 	}

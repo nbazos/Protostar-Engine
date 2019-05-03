@@ -87,7 +87,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	inputSystem.GetInput();
+	inputSystem.Update();
 	sceneManager.Update(deltaTime, totalTime);
 }
 

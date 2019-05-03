@@ -30,8 +30,10 @@ private:
 	void MovePlayerLeft(InputMoveLeft * inputEvent);
 	void MovePlayerRight(InputMoveRight * inputEvent);
 	void PlayerJump(InputJump * inputEvent);
+	void PlayerReverseGravity(InputReverseGravity * inputEvent);
 	int jumpCount;
 	bool doubleJumpControl;
+	bool reverseGravity;
 
 	// Utility
 	void QuickAddEntity(InputQuickAddEntity * inputEvent);
