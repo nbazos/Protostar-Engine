@@ -3,9 +3,9 @@
 #include "EventBus.h"
 #include "Input.h"
 #include "SceneManager.h"
-#include "Render.h"
+#include "Renderer.h"
 // #include "BulletPhysics.h"
-#include <WICTextureLoader.h>
+
 
 class Game : public DXCore {
 public:
@@ -18,11 +18,6 @@ public:
 	void OnResize();
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
-
-	// 
-	void CreateBasicGeometry();
-	void CreateMaterials();
-	void LoadShaders();
 
 	// Overridden mouse input helper methods
 	void OnMouseDown (WPARAM buttonState, int x, int y);
@@ -37,30 +32,13 @@ private:
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
 
-	// Wrappers for DirectX shaders to provide simplified functionality
-	SimpleVertexShader* vertexShader;
-	SimplePixelShader* pixelShader;
-
-	Material* material1;
-	Material* material2;
-	ID3D11ShaderResourceView* brickSRV;
-	ID3D11ShaderResourceView* grassSRV;
-	ID3D11SamplerState* sampler;
-
-	std::vector<Mesh*> meshes;
-	Camera* camera;
-
-	DirectionalLight dirLight1;
-	DirectionalLight dirLight2;
+	Camera* camera;	
 
 	// Engine systems
 	EventBus eventBus;
 	Input inputSystem;
 	SceneManager sceneManager;
-	Render renderSystem;
+	Renderer renderSystem;
 	// BulletPhysics physicsSystem;
-
-
-	std::string vkToString(int vk); // helper method to tell if and when keys are being
 };
 
