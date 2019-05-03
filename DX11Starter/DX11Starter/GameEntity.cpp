@@ -15,7 +15,6 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 	this->rotation = rotation;
 
 	// Physics
-
 	if (entityName == "Player")
 	{
 		//this->collShape = new btCapsuleShape(scale.x/2.0f, (float)scale.y);
@@ -50,15 +49,16 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 
 	if (entityName == "Player")
 	{
-		rBody->setAnisotropicFriction(btVector3(1.0f, 0.0f, 0.0f));
-		rBody->setRestitution(0.8f);
+		rBody->setUserPointer("Player");
+		//rBody->setRestitution(0.8f);
 		//rBody->hasContactResponse();
 	}
 	if (entityName == "Floor" || entityName == "Platform1" || entityName == "Platform2")
 	{
-		rBody->setAnisotropicFriction(btVector3(1.0f, 0.0f, 0.0f));
+		rBody->setAnisotropicFriction(btVector3(2.0f, 0.0f, 0.0f));
+		rBody->setUserPointer("Floor");
 		//rBody->setRollingFriction(0.2f);
-		rBody->setRestitution(0.8f);
+		//rBody->setRestitution(0.8f);
 		//rBody->hasContactResponse();
 	}
 }

@@ -15,18 +15,18 @@ void Input::Init()
 
 void Input::GetInput()
 {
-	/*if (GetKeyState('A'))
+	if (GetKeyState('A') & 0x8000)
 	{
 		InputMoveLeft * ie = DBG_NEW InputMoveLeft();
 		eventBus->Publish(ie);
 		delete ie;
 	}
-	if (GetKeyState('D'))
+	if (GetKeyState('D') & 0x8000)
 	{
 		InputMoveRight * ie = DBG_NEW InputMoveRight();
 		eventBus->Publish(ie);
 		delete ie;
-	}*/
+	}
 }
 
 
@@ -34,26 +34,14 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 {
 	std::string key = vkToString(keyCode);
 	std::cout << key << " was pressed." << std::endl;
-
-	if (key == "A")
-	{
-		InputMoveLeft * ie = DBG_NEW InputMoveLeft();
-		eventBus->Publish(ie);
-		delete ie;
-	}
-	if (key == "D")
-	{
-		InputMoveRight * ie = DBG_NEW InputMoveRight();
-		eventBus->Publish(ie);
-		delete ie;
-	}  
-	if (key == "VK_SPACE")
+  
+	if (keyCode == VK_SPACE)
 	{
 		InputJump * ie = DBG_NEW InputJump();
 		eventBus->Publish(ie);
 		delete ie;
 	}
-	if (key == "P")
+	if (keyCode == VK_OEM_PLUS)
 	{
 		InputQuickAddEntity * ie = DBG_NEW InputQuickAddEntity();
 		eventBus->Publish(ie);

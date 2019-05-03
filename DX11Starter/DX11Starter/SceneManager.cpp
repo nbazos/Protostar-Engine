@@ -15,7 +15,11 @@ void SceneManager::Init()
 	solver = new  btSequentialImpulseConstraintSolver;
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, -9.8f, 0));
+	dynamicsWorld->setGravity(btVector3(0, -4.0f, 0));
+
+	// Player Stuff
+	jumpCount = 0;
+	doubleJumpControl = false;
 }
 
 void SceneManager::Update(float deltaT, float totalT)
@@ -23,10 +27,12 @@ void SceneManager::Update(float deltaT, float totalT)
 	deltaTime = deltaT;
 	totalTime = totalT;
 	sceneCamera->Update(deltaT);
-	PhysicsUpdate();
+	PhysicsStep();
+	CheckCollisionWithFloor();
+	CameraFollow();
 }
 
-void SceneManager::PhysicsUpdate()
+void SceneManager::PhysicsStep()
 {
 	for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
 	{
@@ -36,7 +42,7 @@ void SceneManager::PhysicsUpdate()
 		btTransform transform = body->getWorldTransform();
 		transform.setOrigin(btVector3(sceneEntities[i].GetPosition().x, sceneEntities[i].GetPosition().y, sceneEntities[i].GetPosition().z));
 		transform.setRotation(btQuaternion(sceneEntities[i].GetRotation().y, sceneEntities[i].GetRotation().z, sceneEntities[i].GetRotation().x));
-		body->setWorldTransform(transform);
+		body->getMotionState()->setWorldTransform(transform);
 
 		dynamicsWorld->stepSimulation(deltaTime);
 
@@ -46,6 +52,8 @@ void SceneManager::PhysicsUpdate()
 		sceneEntities[i].SetRotation(transform.getRotation().getX(), transform.getRotation().getY(), transform.getRotation().getZ());
 		sceneEntities[i].SetWorldMatrix();
 	}
+
+	sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, sceneEntities[0].GetRBody()->getLinearVelocity().getY(), 0.0f));
 }
 
 void SceneManager::ExitPhysics()
@@ -110,25 +118,68 @@ void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(-2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-800.0f * deltaTime, 0.0f, 0.0f));
+	sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, sceneEntities[0].GetRBody()->getLinearVelocity().getY(), 0.0f));
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-1.0f, 0.0f, 0.0f));
 }
 
 void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
 {
 	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(800.0f * deltaTime, 0.0f, 0.0f));
+	sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, sceneEntities[0].GetRBody()->getLinearVelocity().getY(), 0.0f));
+	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(1.0f, 0.0f, 0.0f));
 }
 
 void SceneManager::PlayerJump(InputJump * inputEvent)
 {
-	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
-	sceneEntities[0].GetRBody()->activate();
-	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 10000.0f * deltaTime, 0.0f));
+  	jumpCount++;
+
+	if (jumpCount < 3)
+	{
+		sceneEntities[0].GetRBody()->activate();
+		if (jumpCount == 1 && !doubleJumpControl)
+		{
+			sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 4.0f, 0.0f));
+			doubleJumpControl = true;
+		}
+		if (jumpCount == 2 && doubleJumpControl)
+		{
+   			sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(sceneEntities[0].GetRBody()->getLinearVelocity().getX(), 0.0f, 0.0f));
+			sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 4.0f, 0.0f));
+			doubleJumpControl = false;
+		}
+	}
 }
 
 void SceneManager::QuickAddEntity(InputQuickAddEntity * inputEvent)
 {
 	GameEntity temp = GameEntity(sceneEntities[0].entityName, sceneEntities[0].GetMesh(), sceneEntities[0].GetMaterial(), sceneEntities[0].GetDeviceContext(), XMFLOAT3(0, 1, 0), sceneEntities[0].GetScale(), sceneEntities[0].GetRotation(), 1.0f);
 	AddEntityToScene(temp);
+}
+
+void SceneManager::CameraFollow()
+{
+	sceneCamera->SetPosition(sceneEntities[0].GetPosition().x, sceneEntities[0].GetPosition().y, sceneCamera->GetPosition().z);
+}
+
+void SceneManager::CheckCollisionWithFloor()
+{
+	int numManifolds = dispatcher->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		auto* obA = contactManifold->getBody0();
+		auto* obB = contactManifold->getBody1();
+		
+		if (obA->getUserPointer() == "Player" && obB->getUserPointer() == "Floor")
+		{
+			int numContacts = contactManifold->getNumContacts();
+			if (numContacts > 0 && !doubleJumpControl)
+			{
+				jumpCount = 0;
+				doubleJumpControl = false;
+			}
+		}
+	}
+	
 }

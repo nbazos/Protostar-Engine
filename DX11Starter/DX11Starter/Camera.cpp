@@ -58,6 +58,11 @@ void Camera::Rotate(float xRot, float yRot)
 	XMStoreFloat4(&cameraRotation, XMQuaternionRotationRollPitchYaw(xRotation, yRotation, 0));
 }
 
+void Camera::SetPosition(float x, float y, float z)
+{
+	cameraPosition = XMFLOAT3(x, y, z);
+}
+
 void Camera::UpdateViewMatrix()
 {
 	// Rotate the standard "forward" matrix by our rotation

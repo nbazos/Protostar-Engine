@@ -6,7 +6,7 @@
 class Input : public System {
 public:
 	Input();
-	Input(EventBus * eventBusPtr) : System(eventBusPtr) {}
+	Input(EventBus * eventBusPtr, int doubleJump = 0) : System(eventBusPtr) {}
 	~Input();
 
 	void Init();

@@ -14,6 +14,7 @@ public:
 	void MoveRelative(float x, float y, float z); // Moves the camera relative to its orientation
 	void MoveAbsolute(float x, float y, float z); // Moves the camera in world space
 	void Rotate(float xRot, float yRot);
+	void SetPosition(float x, float y, float z);
 
 	void Update(float deltaTime);
 	void UpdateViewMatrix();
@@ -21,6 +22,7 @@ public:
 
 	XMFLOAT4X4 GetViewMatrix() { return viewMatrix; };
 	XMFLOAT4X4 GetProjectionMatrix() { return projectionMatrix; };
+	XMFLOAT3 GetPosition() { return cameraPosition; };
 
 	void CheckInput(float moveSpeed);
 
