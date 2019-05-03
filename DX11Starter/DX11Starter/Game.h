@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "Renderer.h"
+#include "Sound.h"
 // #include "BulletPhysics.h"
 
 
@@ -20,10 +21,10 @@ public:
 	void Draw(float deltaTime, float totalTime);
 
 	// Overridden mouse input helper methods
-	void OnMouseDown (WPARAM buttonState, int x, int y);
-	void OnMouseUp	 (WPARAM buttonState, int x, int y);
-	void OnMouseMove (WPARAM buttonState, int x, int y);
-	void OnMouseWheel(float wheelDelta,   int x, int y);
+	void OnMouseDown(WPARAM buttonState, int x, int y);
+	void OnMouseUp(WPARAM buttonState, int x, int y);
+	void OnMouseMove(WPARAM buttonState, int x, int y);
+	void OnMouseWheel(float wheelDelta, int x, int y);
 	void OnKeyDown(WPARAM keyCode, LPARAM keyDetails);
 	void OnKeyUp(WPARAM keyCode, LPARAM keyDetails);
 
@@ -39,6 +40,6 @@ private:
 	Input inputSystem;
 	SceneManager sceneManager;
 	Renderer renderSystem;
+	Sound soundEngine;
 	// BulletPhysics physicsSystem;
 };
-

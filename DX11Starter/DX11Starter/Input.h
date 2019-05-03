@@ -18,4 +18,3 @@ private:
 	bool cameraControlMode = false;
 	std::string vkToString(int vk);
 };
-

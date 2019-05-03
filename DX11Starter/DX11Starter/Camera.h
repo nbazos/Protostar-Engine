@@ -24,15 +24,18 @@ public:
 	XMFLOAT4X4 GetProjectionMatrix() { return projectionMatrix; };
 	XMFLOAT3 GetPosition() { return cameraPosition; };
 
+	void CheckInput(float moveSpeed);
+
 private:
 	XMFLOAT4X4 viewMatrix;
 	XMFLOAT4X4 projectionMatrix;
 
 	XMFLOAT3 startPosition;
 	XMFLOAT3 cameraPosition;
+
 	XMFLOAT4 cameraRotation;
 	float xRotation;
 	float yRotation;
 
-	void CheckInput(float moveSpeed);
+	
 };

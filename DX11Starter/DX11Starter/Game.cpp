@@ -24,8 +24,9 @@ Game::Game(HINSTANCE hInstance)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
+
 #endif
-	
+
 }
 
 // --------------------------------------------------------
@@ -51,7 +52,7 @@ void Game::Init()
 	// Create camera & initial projection matrix
 	camera = new Camera(0.0f, 0.0f, -15.0f);
 	camera->UpdateProjectionMatrix((float)width / height);
-	
+  
 	// Engine Subsystem & Communication Initialization
 	eventBus = EventBus();
 	inputSystem = Input(&eventBus);
@@ -59,6 +60,9 @@ void Game::Init()
 	sceneManager.Init();
 	renderSystem = Renderer(context, device, width, height, backBufferRTV, depthStencilView, swapChain, camera, &sceneManager);
 	renderSystem.Init();
+	soundEngine = Sound(&eventBus);
+	soundEngine.Init();
+	//soundEngine.PlaySounds("../../DX11Starter/audio/Backgrnd2.wav", Vector3{ 5, 0, -20 }, 0.5);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -89,6 +93,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	inputSystem.Update();
 	sceneManager.Update(deltaTime, totalTime);
+	soundEngine.Update();
 }
 
 // --------------------------------------------------------
@@ -176,4 +181,3 @@ void Game::OnKeyUp(WPARAM keyCode, LPARAM keyDetails)
 	inputSystem.ProcessKeyUp(keyCode);
 }
 #pragma endregion
-

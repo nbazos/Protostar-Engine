@@ -34,8 +34,7 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 {
 	std::string key = vkToString((int)keyCode);
 	std::cout << key << " was pressed." << std::endl;
-
-	
+  
 	if (keyCode == VK_SPACE)
 	{
 		InputJump * ie = DBG_NEW InputJump();
