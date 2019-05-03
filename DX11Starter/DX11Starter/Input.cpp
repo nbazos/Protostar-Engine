@@ -32,7 +32,7 @@ void Input::GetInput()
 
 void Input::ProcessKeyDown(WPARAM keyCode)
 {
-	std::string key = vkToString(keyCode);
+	std::string key = vkToString((int)keyCode);
 	std::cout << key << " was pressed." << std::endl;
 
 	
@@ -52,7 +52,7 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 
 void Input::ProcessKeyUp(WPARAM keyCode)
 {
-	std::string key = vkToString(keyCode);
+	std::string key = vkToString((int)keyCode);
 	std::cout << key << " was released." << std::endl;
 	std::cout << std::endl;
 }

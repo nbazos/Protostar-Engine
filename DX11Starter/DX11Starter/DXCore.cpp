@@ -584,7 +584,7 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		if (wParam == VK_SPACE || wParam == VK_OEM_PLUS)
 		{
 			OnKeyDown(wParam, lParam);
-			lastKeyPressed = wParam;
+			lastKeyPressed = (int)wParam;
 		}
 
 		return 0;
