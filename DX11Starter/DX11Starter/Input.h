@@ -10,7 +10,7 @@ public:
 	~Input();
 
 	void Init();
-	void GetInput();
+	void Update();
 	void ProcessKeyDown(WPARAM keyCode);
 	void ProcessKeyUp(WPARAM keyCode);
 

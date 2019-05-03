@@ -6,6 +6,7 @@ void SceneManager::Init()
 	eventBus->Subscribe(this, &SceneManager::MovePlayerLeft);
 	eventBus->Subscribe(this, &SceneManager::MovePlayerRight);
 	eventBus->Subscribe(this, &SceneManager::PlayerJump);
+	eventBus->Subscribe(this, &SceneManager::PlayerReverseGravity);
 	eventBus->Subscribe(this, &SceneManager::QuickAddEntity);
 
 	// Physics
@@ -15,21 +16,26 @@ void SceneManager::Init()
 	solver = new  btSequentialImpulseConstraintSolver;
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, -4.0f, 0));
+	dynamicsWorld->setGravity(btVector3(0, -3.0f, 0));
 
 	// Player Stuff
 	jumpCount = 0;
 	doubleJumpControl = false;
+	reverseGravity = false;
 }
 
 void SceneManager::Update(float deltaT, float totalT)
 {
 	deltaTime = deltaT;
 	totalTime = totalT;
+
 	sceneCamera->Update(deltaT);
 	PhysicsStep();
 	CheckCollisionWithFloor();
 	CameraFollow();
+	CleanUpEntities();
+
+	std::cout << "Number of live entities: " << sceneEntities.size() << std::endl;
 }
 
 void SceneManager::PhysicsStep()
@@ -44,7 +50,7 @@ void SceneManager::PhysicsStep()
 		transform.setRotation(btQuaternion(sceneEntities[i].GetRotation().y, sceneEntities[i].GetRotation().z, sceneEntities[i].GetRotation().x));
 		body->getMotionState()->setWorldTransform(transform);
 
-		dynamicsWorld->stepSimulation(deltaTime);
+		dynamicsWorld->stepSimulation(deltaTime*0.5f);
 
 		body->getMotionState()->getWorldTransform(transform);
 
@@ -83,7 +89,6 @@ void SceneManager::ExitPhysics()
 		btCollisionShape* shape = sceneEntities[j].GetCollShape();
 		delete shape;
 	}
-	// m_collisionShapes.clear();
 
 	delete dynamicsWorld;
 	dynamicsWorld = 0;
@@ -109,6 +114,15 @@ void SceneManager::AddEntityToScene(GameEntity entity)
 	dynamicsWorld->addRigidBody(entity.GetRBody());
 }
 
+void SceneManager::RemoveEntityFromScene(int entityIndex)
+{
+	dynamicsWorld->removeCollisionObject(sceneEntities[entityIndex].GetRBody());
+	delete sceneEntities[entityIndex].GetRBody()->getMotionState();
+	delete sceneEntities[entityIndex].GetRBody();
+	delete sceneEntities[entityIndex].GetCollShape();
+	sceneEntities.erase(sceneEntities.begin() + entityIndex);
+}
+
 std::vector<GameEntity> * SceneManager::GetSceneEntities()
 {
 	return &sceneEntities;
@@ -116,7 +130,6 @@ std::vector<GameEntity> * SceneManager::GetSceneEntities()
 
 void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 {
-	/*sceneEntities[0].MoveAbsolute(-2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
 	sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, sceneEntities[0].GetRBody()->getLinearVelocity().getY(), 0.0f));
 	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(-1.0f, 0.0f, 0.0f));
@@ -124,7 +137,6 @@ void SceneManager::MovePlayerLeft(InputMoveLeft * inputEvent)
 
 void SceneManager::MovePlayerRight(InputMoveRight * inputEvent)
 {
-	/*sceneEntities[0].MoveAbsolute(2.0f * deltaTime, 0.0f, 0.0f);*/
 	sceneEntities[0].GetRBody()->activate();
 	sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, sceneEntities[0].GetRBody()->getLinearVelocity().getY(), 0.0f));
 	sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(1.0f, 0.0f, 0.0f));
@@ -139,15 +151,48 @@ void SceneManager::PlayerJump(InputJump * inputEvent)
 		sceneEntities[0].GetRBody()->activate();
 		if (jumpCount == 1 && !doubleJumpControl)
 		{
-			sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 4.0f, 0.0f));
+			sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(sceneEntities[0].GetRBody()->getLinearVelocity().getX(), 0.0f, 0.0f));
+			if (!reverseGravity)
+			{
+				sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 4.0f, 0.0f));
+			}
+			else
+			{
+				sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, -4.0f, 0.0f));
+			}
 			doubleJumpControl = true;
 		}
 		if (jumpCount == 2 && doubleJumpControl)
 		{
    			sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(sceneEntities[0].GetRBody()->getLinearVelocity().getX(), 0.0f, 0.0f));
-			sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 4.0f, 0.0f));
+			if (!reverseGravity)
+			{
+				sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, 4.0f, 0.0f));
+			}
+			else
+			{
+				sceneEntities[0].GetRBody()->applyCentralImpulse(btVector3(0.0f, -4.0f, 0.0f));
+			}
 			doubleJumpControl = false;
 		}
+	}
+}
+
+void SceneManager::PlayerReverseGravity(InputReverseGravity * inputEvent)
+{
+	sceneEntities[0].GetRBody()->activate();
+
+	if (!reverseGravity)
+	{
+		sceneEntities[0].GetRBody()->setGravity(btVector3(0.0f, 3.0f, 0.0f));
+		sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
+		reverseGravity = true;
+	}
+	else
+	{
+		sceneEntities[0].GetRBody()->setGravity(btVector3(0.0f, -3.0f, 0.0f));
+		sceneEntities[0].GetRBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
+		reverseGravity = false;
 	}
 }
 
@@ -181,5 +226,17 @@ void SceneManager::CheckCollisionWithFloor()
 			}
 		}
 	}
-	
+}
+
+// Removes non-player entities which have fallen too far down in the world
+void SceneManager::CleanUpEntities()
+{
+	for (int i = 1; i < sceneEntities.size(); i++)
+	{
+		if (sceneEntities[i].GetRBody()->getWorldTransform().getOrigin().getY() < -20.0f)
+		{
+			RemoveEntityFromScene(i);
+			break;
+		}
+	}
 }

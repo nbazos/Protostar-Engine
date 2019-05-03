@@ -1,9 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
 
-// For the DirectX Math library
-using namespace DirectX;
-
 // --------------------------------------------------------
 // Constructor
 //
@@ -21,14 +18,7 @@ Game::Game(HINSTANCE hInstance)
 		true)			// Show extra stats (fps) in title bar?
 {
 	// Initialize fields
-	vertexShader = 0;
-	pixelShader = 0;
 	camera = 0;
-	material1 = 0;
-	material2 = 0;
-	brickSRV = 0;
-	grassSRV = 0;
-	sampler = 0;
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -46,35 +36,11 @@ Game::Game(HINSTANCE hInstance)
 // --------------------------------------------------------
 Game::~Game()
 {
-	// Delete our simple shader objects, which
-	// will clean up their own internal DirectX stuff
-	delete vertexShader;
-	delete pixelShader;
 	delete camera;
 
-	delete material1;
-	delete material2;
-
-	if (brickSRV != nullptr)
-	{
-		brickSRV->Release();
-	}
-
-	if (grassSRV != nullptr)
-	{
-		grassSRV->Release();
-	}
-
-	if (sampler != nullptr)
-	{
-		sampler->Release();
-	}
-
-	// Delete Meshes & GameEntities
-	for (auto& m : meshes) delete m;
-
-	// Deallocate Physics System
+	// Deallocate systems
 	sceneManager.ExitPhysics();
+	renderSystem.ExitRenderer();
 }
 
 // --------------------------------------------------------
@@ -83,27 +49,16 @@ Game::~Game()
 // --------------------------------------------------------
 void Game::Init()
 {
-	// Helper methods for loading shaders, creating some basic
-	// geometry to draw and some simple camera matrices.
-	//  - You'll be expanding and/or replacing these later
-	LoadShaders();
-	CreateMaterials();
-
 	// Create camera & initial projection matrix
 	camera = new Camera(0.0f, 0.0f, -15.0f);
 	camera->UpdateProjectionMatrix((float)width / height);
-
-	// Define directional lights for the scene
-	dirLight1 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f) };
-	dirLight2 = { XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
-
+  
 	// Engine Subsystem & Communication Initialization
 	eventBus = EventBus();
 	inputSystem = Input(&eventBus);
 	sceneManager = SceneManager(&eventBus, camera);
 	sceneManager.Init();
-	CreateBasicGeometry();
-	renderSystem = Render(context, device, width, height, backBufferRTV, depthStencilView, swapChain, sceneManager.GetSceneEntities(), camera);
+	renderSystem = Renderer(context, device, width, height, backBufferRTV, depthStencilView, swapChain, camera, &sceneManager);
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
 	soundEngine.Init();
@@ -112,67 +67,6 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void Game::LoadShaders()
-{
-	vertexShader = new SimpleVertexShader(device, context);
-	vertexShader->LoadShaderFile(L"VertexShader.cso");
-
-	pixelShader = new SimplePixelShader(device, context);
-	pixelShader->LoadShaderFile(L"PixelShader.cso");
-}
-
-void Game::CreateMaterials()
-{
-	// Load textures
-	CreateWICTextureFromFile(
-		device,					// The Direct3D device for resource creation
-		context,				// Rendering context (this will auto-generate mip maps!!!)
-		L"../../Assets/Textures/round_brick.jpg",	// Path to the file ("L" means wide characters)
-		0,						// Texture ref?  No thanks!  (0 means we don't want an extra ref)
-		&brickSRV);				// Actual SRV for use with shaders
-
-	CreateWICTextureFromFile(
-		device,					// The Direct3D device for resource creation
-		context,				// Rendering context (this will auto-generate mip maps!!!)
-		L"../../Assets/Textures/grass.jpg",	// Path to the file ("L" means wide characters)
-		0,						// Texture ref?  No thanks!  (0 means we don't want an extra ref)
-		&grassSRV);
-
-	// Create sampler state
-	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.MaxAnisotropy = 16;
-	device->CreateSamplerState(&samplerDesc, &sampler);
-
-	material1 = new Material(vertexShader, pixelShader, brickSRV, sampler);
-	material2 = new Material(vertexShader, pixelShader, grassSRV, sampler);
-}
-
-void Game::CreateBasicGeometry()
-{
-	Mesh* cubeMesh = new Mesh("../../Assets/Models/cube.obj", device);
-	Mesh* playerMesh = new Mesh("../../Assets/Models/sphere.obj", device);
-	meshes.push_back(cubeMesh);
-	meshes.push_back(playerMesh);
-
-	// Create GameEntities that utilize the meshes
-	GameEntity player = GameEntity("Player", playerMesh, material2, context, XMFLOAT3(1, 3, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
-	GameEntity floor = GameEntity("Floor", cubeMesh, material1, context, XMFLOAT3(0, -2.0f, 0), XMFLOAT3(10.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity platform1 = GameEntity("Platform1", cubeMesh, material1, context, XMFLOAT3(3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity platform2 = GameEntity("Platform2", cubeMesh, material1, context, XMFLOAT3(-3, 1.0f, 0), XMFLOAT3(3.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f);
-	GameEntity crate = GameEntity("Crate", cubeMesh, material1, context, XMFLOAT3(0, -1.0f, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
-
-	sceneManager.AddEntityToScene(player);
-	sceneManager.AddEntityToScene(floor);
-	sceneManager.AddEntityToScene(platform1);
-	sceneManager.AddEntityToScene(platform2);
-	sceneManager.AddEntityToScene(crate);
 }
 
 // --------------------------------------------------------
@@ -196,7 +90,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	inputSystem.GetInput();
+	inputSystem.Update();
 	sceneManager.Update(deltaTime, totalTime);
 	soundEngine.Update();
 }
@@ -206,15 +100,6 @@ void Game::Update(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void Game::Draw(float deltaTime, float totalTime)
 {
-	pixelShader->SetData(
-		"light1",
-		&dirLight1,
-		sizeof(DirectionalLight));
-	pixelShader->SetData(
-		"light2",
-		&dirLight2,
-		sizeof(DirectionalLight));
-
 	renderSystem.Draw(deltaTime, totalTime);
 }
 
@@ -242,8 +127,6 @@ void Game::OnMouseDown(WPARAM buttonState, int x, int y)
 // --------------------------------------------------------
 void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 {
-	// Add any custom code here...
-
 	// We don't care about the tracking the cursor outside
 	// the window anymore (we're not dragging if the mouse is up)
 	ReleaseCapture();
@@ -280,6 +163,12 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 }
 #pragma endregion
 
+#pragma region Keyboard Input
+
+// --------------------------------------------------------
+// Methods used to process how keypresses can be handled 
+// when the OS sends through WM_KEYDOWN or WM_KEYUP messages
+// --------------------------------------------------------
 void Game::OnKeyDown(WPARAM keyCode, LPARAM keyDetails)
 {
 	inputSystem.ProcessKeyDown(keyCode);
@@ -290,3 +179,4 @@ void Game::OnKeyUp(WPARAM keyCode, LPARAM keyDetails)
 {
 	inputSystem.ProcessKeyUp(keyCode);
 }
+#pragma endregion
