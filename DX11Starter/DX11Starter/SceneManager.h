@@ -12,37 +12,40 @@ public:
 
 	void Init();
 	void Update(float deltaT, float totalT);
-
 	void PhysicsStep();
 	void ExitPhysics();
 
-	void AddEntityToScene(GameEntity entity);
-	//void RemoveEntityFromScene(char * entityName);
+	void AddEntityToScene(GameEntity entity);	
 	std::vector<GameEntity>* GetSceneEntities();
 
-private:
+private: // Members
 	std::vector<GameEntity> sceneEntities;
 	Camera* sceneCamera;
 	float deltaTime;
 	float totalTime;
-
-	// Player Control
-	void MovePlayerLeft(InputMoveLeft * inputEvent);
-	void MovePlayerRight(InputMoveRight * inputEvent);
-	void PlayerJump(InputJump * inputEvent);
 	int jumpCount;
 	bool doubleJumpControl;
-
-	// Utility
-	void QuickAddEntity(InputQuickAddEntity * inputEvent);
-	void CameraFollow();
-
+	bool reverseGravity;
+	
 	// Physics
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* dispatcher;
 	btBroadphaseInterface* broadphase;
 	btSequentialImpulseConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamicsWorld;
+
+private: // Methods
+	void RemoveEntityFromScene(int entityIndex);
+
+	// Player Control
+	void MovePlayerLeft(InputMoveLeft * inputEvent);
+	void MovePlayerRight(InputMoveRight * inputEvent);
+	void PlayerJump(InputJump * inputEvent);
+	void PlayerReverseGravity(InputReverseGravity * inputEvent);
+  
+	void CameraFollow();
+	void QuickAddEntity(InputQuickAddEntity * inputEvent);
 	void CheckCollisionWithFloor();
+	void CleanUpEntities();
 };
 

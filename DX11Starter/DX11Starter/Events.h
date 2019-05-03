@@ -16,10 +16,11 @@ struct InputEvent : public Event {
 	//~InputEvent() {}
 };
 
-struct InputMoveLeft : public Event {};
-struct InputMoveRight : public Event {};
-struct InputJump : public Event {};
-struct InputQuickAddEntity : public Event {};
+struct InputMoveLeft		: public Event {};
+struct InputMoveRight		: public Event {};
+struct InputJump			: public Event {};
+struct InputQuickAddEntity	: public Event {};
+struct InputReverseGravity	: public Event {};
 
 // Audio Playback Events
 struct PauseAudio : public Event {};

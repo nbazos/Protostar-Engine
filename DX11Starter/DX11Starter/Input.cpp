@@ -13,7 +13,7 @@ void Input::Init()
 
 }
 
-void Input::GetInput()
+void Input::Update()
 {
 	if (GetKeyState('A') & 0x8000)
 	{
@@ -32,7 +32,7 @@ void Input::GetInput()
 
 void Input::ProcessKeyDown(WPARAM keyCode)
 {
-	std::string key = vkToString(keyCode);
+	std::string key = vkToString((int)keyCode);
 	std::cout << key << " was pressed." << std::endl;
   
 	if (keyCode == VK_SPACE)
@@ -47,11 +47,17 @@ void Input::ProcessKeyDown(WPARAM keyCode)
 		eventBus->Publish(ie);
 		delete ie;
 	}
+	if (keyCode == VK_SHIFT)
+	{
+		InputReverseGravity * ie = DBG_NEW InputReverseGravity();
+		eventBus->Publish(ie);
+		delete ie;
+	}
 }
 
 void Input::ProcessKeyUp(WPARAM keyCode)
 {
-	std::string key = vkToString(keyCode);
+	std::string key = vkToString((int)keyCode);
 	std::cout << key << " was released." << std::endl;
 	std::cout << std::endl;
 }

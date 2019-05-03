@@ -17,8 +17,9 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 	// Physics
 	if (entityName == "Player")
 	{
-		//this->collShape = new btCapsuleShape(scale.x/2.0f, (float)scale.y);
+		// this->collShape = new btCapsuleShape(scale.x, (float)scale.y);
 		this->collShape = new btSphereShape(scale.x / 2.0f);
+		// this->collShape = new btBoxShape(btVector3(btScalar(scale.x / 2.0f), btScalar(scale.y / 2.0f), btScalar(scale.z / 2.0f)));
 	}
 	else
 	{
@@ -50,16 +51,24 @@ GameEntity::GameEntity(char * name, Mesh* mesh, Material* material, ID3D11Device
 	if (entityName == "Player")
 	{
 		rBody->setUserPointer("Player");
-		//rBody->setRestitution(0.8f);
+		rBody->setRestitution(1.0f);
 		//rBody->hasContactResponse();
 	}
-	if (entityName == "Floor" || entityName == "Platform1" || entityName == "Platform2")
+	if (entityName == "Floor" || entityName == "Platform")
 	{
-		rBody->setAnisotropicFriction(btVector3(2.0f, 0.0f, 0.0f));
+		rBody->setAnisotropicFriction(btVector3(4.0f, 0.0f, 0.0f));
 		rBody->setUserPointer("Floor");
 		//rBody->setRollingFriction(0.2f);
 		//rBody->setRestitution(0.8f);
 		//rBody->hasContactResponse();
+	}
+	if (entityName == "Crate")
+	{
+		rBody->setAnisotropicFriction(btVector3(2.0f, 0.0f, 0.0f));
+	}
+	if (entityName == "Bouncy Platform")
+	{
+		rBody->setRestitution(1.0f);
 	}
 }
 
