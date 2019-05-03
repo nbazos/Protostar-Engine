@@ -62,6 +62,7 @@ void Game::Init()
 	renderSystem.Init();
 	soundEngine = Sound(&eventBus);
 	soundEngine.Init();
+	//soundEngine.PlaySounds("../../DX11Starter/audio/Backgrnd2.wav", Vector3{ 5, 0, -20 }, 0.5);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  

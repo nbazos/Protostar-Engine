@@ -3,7 +3,7 @@
 #include "EventBus.h"
 #include "Input.h"
 #include "SceneManager.h"
-#include "Render.h"
+#include "Renderer.h"
 #include "Sound.h"
 // #include "BulletPhysics.h"
 
@@ -39,7 +39,7 @@ private:
 	EventBus eventBus;
 	Input inputSystem;
 	SceneManager sceneManager;
-	Render renderSystem;
+	Renderer renderSystem;
 	Sound soundEngine;
 	// BulletPhysics physicsSystem;
 };
