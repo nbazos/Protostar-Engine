@@ -33,8 +33,9 @@ void SceneManager::Update(float deltaT, float totalT)
 	PhysicsStep();
 	CheckCollisionWithFloor();
 	CameraFollow();
+	CleanUpEntities();
 
-	
+	std::cout << "Number of live entities: " << sceneEntities.size() << std::endl;
 }
 
 void SceneManager::PhysicsStep()
@@ -111,6 +112,15 @@ void SceneManager::AddEntityToScene(GameEntity entity)
 
 	// Add to bullet physics
 	dynamicsWorld->addRigidBody(entity.GetRBody());
+}
+
+void SceneManager::RemoveEntityFromScene(int entityIndex)
+{
+	dynamicsWorld->removeCollisionObject(sceneEntities[entityIndex].GetRBody());
+	delete sceneEntities[entityIndex].GetRBody()->getMotionState();
+	delete sceneEntities[entityIndex].GetRBody();
+	delete sceneEntities[entityIndex].GetCollShape();
+	sceneEntities.erase(sceneEntities.begin() + entityIndex);
 }
 
 std::vector<GameEntity> * SceneManager::GetSceneEntities()
@@ -214,6 +224,19 @@ void SceneManager::CheckCollisionWithFloor()
 				jumpCount = 0;
 				doubleJumpControl = false;
 			}
+		}
+	}
+}
+
+// Removes non-player entities which have fallen too far down in the world
+void SceneManager::CleanUpEntities()
+{
+	for (int i = 1; i < sceneEntities.size(); i++)
+	{
+		if (sceneEntities[i].GetRBody()->getWorldTransform().getOrigin().getY() < -20.0f)
+		{
+			RemoveEntityFromScene(i);
+			break;
 		}
 	}
 }
